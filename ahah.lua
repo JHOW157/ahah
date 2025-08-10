@@ -35,10 +35,6 @@ local mensagem_enviada = false
 local status_log = {
     ativo = configuracao_log.LogsDiscord.ativado
 }
--- DESATIVAR MENU ONLINE
-local UrlStatus = "https://jhon-fs.github.io/Menu/sampmob.json"
-local CaminhoChave = getWorkingDirectory() .. "/JhowModsOfc/Menu Mobile/.config.log"
-local AtivarMenu = false
 
 local GUI = {
     AbrirMenu = imgui.new.bool(false),
@@ -249,7 +245,6 @@ function main()
         wait(100)
     end
     ScriptNomeOriginal()
-    carregarStatusOnline()
     sampRegisterChatCommand("menu", function()
         if not AtivarMenu then
             sampAddChatMessage("{FF0000}Menu desativado pelo desenvolvedor ou voce nao tem acesso a key.", -1)
@@ -305,67 +300,6 @@ function ScriptNomeOriginal()
     end
     VerificarNomeScript = true
 end
-
-function GerarChave(tamanho) -- DESATIVAR MENU ONLINE
-    local ChaveAltenativa = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    local chave = ''
-    for i = 1, tamanho do
-        local Aleatoria = math.random(1, #ChaveAltenativa)
-        chave = chave .. ChaveAltenativa:sub(Aleatoria, Aleatoria)
-    end
-    return chave
-end
-
-function ObterChavesSite()
-    local response, status = https.request(UrlStatus)
-    if status == 200 and response then
-        local data = json.decode(response)
-        if data and type(data.chaves_validas) == "table" then
-            return data.versao_1, data.chaves_validas
-        end
-    end
-    return nil, {}
-end
-
-function ChaveExisteNoSite(chave, lista)
-    for _, verificacao in ipairs(lista) do
-        if verificacao == chave then
-            return true
-        end
-    end
-    return false
-end
-
-function ObterOuCriarChave()
-    local file = io.open(CaminhoChave, "r")
-    if file then
-        local chave = file:read("*l")
-        file:close()
-        return chave
-    else
-        local _, listaChaves = ObterChavesSite()
-        local chaveNova
-        repeat
-            chaveNova = GerarChave(32)
-        until not ChaveExisteNoSite(chaveNova, listaChaves)
-        local fileW = io.open(CaminhoChave, "w")
-        if fileW then
-            fileW:write(chaveNova)
-            fileW:close()
-        end
-        return chaveNova
-    end
-end
-
-local chaveDoMenu = ObterOuCriarChave()
-function carregarStatusOnline()
-    local statusMenu, listaChaves = ObterChavesSite()
-    if statusMenu == "online" and ChaveExisteNoSite(chaveDoMenu, listaChaves) then
-        AtivarMenu = true
-    else
-        AtivarMenu = false
-    end
-end -- FIM DESATIVAR MENU ONLINE
 
 function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
     local file = io.open(path, "r")
