@@ -237,8 +237,31 @@ function main()
 
     while true do
         wait(0)
+        EspLine()
     end
 end -- FIM MAIN
+
+function EspLine()
+    if GUI.EspLine[0] then
+        local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
+        for playerId = 0, sampGetMaxPlayerId(false) do
+            if sampIsPlayerConnected(playerId) then
+                local result, playerPed = sampGetCharHandleBySampPlayerId(playerId)
+                if result and doesCharExist(playerPed) and isCharOnScreen(playerPed) then
+                    local targetX, targetY, targetZ = getCharCoordinates(playerPed)
+                    local distance = getDistanceBetweenCoords3d(playerX, playerY, playerZ, targetX, targetY, targetZ)
+                    if distance <= 300 then
+                        local lineEndX, lineEndY = convert3DCoordsToScreen(targetX, targetY, targetZ)
+                        local screenWidth, screenHeight = getScreenResolution()
+                        local lineStartX = screenWidth / 2
+                        local lineStartY = 0
+                        renderDrawLine(lineStartX, lineStartY, lineEndX, lineEndY, 2, 0xFFFF0000)
+                    end
+                end
+            end
+        end
+    end
+end
 
 function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
     local file = io.open(path, "r")
