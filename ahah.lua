@@ -2,6 +2,10 @@ local imgui = require "mimgui"
 local new = imgui.new
 local faicons = require('fAwesome6')
 
+-- AIMBOT
+memory.require("CCamera")
+local camera_principal = memory.camera
+
 -- IMAGEM
 local Imagem = nil
 local Imagem2 = nil
@@ -237,9 +241,176 @@ function main()
 
     while true do
         wait(0)
+        Aimbot()
         EspLine()
     end
 end -- FIM MAIN
+
+-- AIMBOT
+function obterPosicaoDoOsso(id_char, id_osso)
+    local ponteiro_char = ffi.cast("void*", getCharPointer(id_char))
+    local posicao_osso = ffi.new("RwV3d[1]")
+
+    gtasa._ZN4CPed15GetBonePositionER5RwV3djb(ponteiro_char, posicao_osso, id_osso, false)
+
+    return posicao_osso[0].x, posicao_osso[0].y, posicao_osso[0].z
+end
+
+local larguraTela, alturaTela = getScreenResolution()
+
+function obterRotacaoDaCamera()
+    local anguloHorizontal = camera_principal.aCams[0].fHorizontalAngle
+    local anguloVertical = camera_principal.aCams[0].fVerticalAngle
+    return anguloHorizontal, anguloVertical
+end
+
+function definirRotacaoDaCamera(anguloHorizontal, anguloVertical)
+    camera_principal.aCams[0].fHorizontalAngle = anguloHorizontal
+    camera_principal.aCams[0].fVerticalAngle = anguloVertical
+end
+
+function converterCoordenadasCartesianasParaEsfericas(posicao)
+    local vetor = posicao - vector3d(getActiveCameraCoordinates())
+    local comprimento = vetor:length()
+    local anguloHorizontal = math.atan2(vetor.y, vetor.x)
+    local anguloVertical = math.acos(vetor.z / comprimento)
+
+    if anguloHorizontal > 0 then
+        anguloHorizontal = anguloHorizontal - math.pi
+    else
+        anguloHorizontal = anguloHorizontal + math.pi
+    end
+
+    local anguloVerticalFinal = math.pi / 2 - anguloVertical
+    return anguloHorizontal, anguloVerticalFinal
+end
+
+function obterPosicaoDoMiraNaTela()
+    local largura, altura = getScreenResolution()
+    local posicaoX = largura * GUI.LaguraX[0]
+    local posicaoY = altura * GUI.AlturaY[0]
+    return posicaoX, posicaoY
+end
+
+function obterRotacaoDoMira(distancia)
+    distancia = distancia or 5
+    local posicaoX, posicaoY = obterPosicaoDoMiraNaTela()
+    local ponto3D = vector3d(convertScreenCoordsToWorld3D(posicaoX, posicaoY, distancia))
+    return converterCoordenadasCartesianasParaEsfericas(ponto3D)
+end
+
+function mirarPontoComM16(ponto)
+    local anguloHorizontal, anguloVertical = converterCoordenadasCartesianasParaEsfericas(ponto)
+    local rotacaoHorizontal, rotacaoVertical = obterRotacaoDaCamera()
+    local miraHorizontal, miraVertical = obterRotacaoDoMira()
+    local novaRotacaoHorizontal = rotacaoHorizontal + (anguloHorizontal - miraHorizontal)
+    local novaRotacaoVertical = rotacaoVertical + (anguloVertical - miraVertical)
+    definirRotacaoDaCamera(novaRotacaoHorizontal, novaRotacaoVertical)
+end
+
+function mirarPontoComMiraTelescopica(ponto)
+    local anguloHorizontal, anguloVertical = converterCoordenadasCartesianasParaEsfericas(ponto)
+    definirRotacaoDaCamera(anguloHorizontal, anguloVertical)
+end
+
+function obterCharProximoAoCentro(distanciaMaxima)
+    local charsProximos = {}
+    local largura, altura = getScreenResolution()
+
+    for _, char in ipairs(getAllChars()) do
+        if isCharOnScreen(char) and char ~= PLAYER_PED and not isCharDead(char) then
+            local coordX, coordY, coordZ = getCharCoordinates(char)
+            local posX, posY = convert3DCoordsToScreen(coordX, coordY, coordZ)
+            local distancia = getDistanceBetweenCoords2d(largura / 2 + 3, altura / 2 + 3, posX, posY)
+
+            if isCurrentCharWeapon(PLAYER_PED, 34) then
+                distancia = getDistanceBetweenCoords2d(largura / 2, altura / 2, posX, posY)
+            end
+
+            if distancia <= tonumber(distanciaMaxima and distanciaMaxima or altura) then
+                table.insert(charsProximos, {
+                    distancia,
+                    char
+                })
+            end
+        end
+    end
+
+    if #charsProximos > 0 then
+        table.sort(charsProximos, function(a, b)
+            return a[1] < b[1]
+        end)
+        return charsProximos[1][2]
+    end
+
+    return nil
+end
+
+function Aimbot()
+    if GUI.AtivarAimbot[0] then
+        local distanciaMaxima = math.floor((GUI.DistanciaAimbot[0] - 1) * (120 - 0) / (100 - 1))
+        local modoCamera = camera_principal.aCams[0].nMode
+        local suavidadeMaxia = math.floor(100 + (GUI.SuavidadeAimbot[0] - 1) * (250 - 100) / (100 - 1))
+        local charProximo = obterCharProximoAoCentro(suavidadeMaxia)
+
+        if charProximo then
+            local result, playerId = sampGetPlayerIdByCharHandle(charProximo)
+            
+            if result and not isTargetAfkAim(playerId) and not isPlayerInVehicleAim(charProximo) then
+                local posicaoX, posicaoY, posicaoZ = obterPosicaoDoOsso(charProximo, 5)
+                local coordX, coordY, coordZ = getCharCoordinates(PLAYER_PED)
+                local distanciaTotal = getDistanceBetweenCoords3d(coordX, coordY, coordZ, posicaoX, posicaoY, posicaoZ)
+
+                if distanciaTotal < distanciaMaxima then
+                    local charAlvo = charProximo
+                    local alvoX, alvoY, alvoZ = obterPosicaoDoOsso(charAlvo, 5)
+
+                    local myPos = {coordX, coordY, coordZ}
+                    local enPos = {alvoX, alvoY, alvoZ}
+                    if isClearObject(myPos, enPos) then
+                        ponto = vector3d(alvoX, alvoY, alvoZ)
+
+                        if modoCamera == 7 then
+                            mirarPontoComMiraTelescopica(ponto)
+                        elseif modoCamera == 53 then
+                            mirarPontoComM16(ponto)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+function isTargetAfkAim(playerId) -- IGNORE AFK AIMBOT
+    if GUI.IgnoreAfkAim[0] then
+        return sampIsPlayerPaused(playerId)
+    end
+    return false
+end
+
+function isPlayerInVehicleAim(charProximo) -- IGNORE VEICULO AIMBOT
+    if GUI.IgnoreVeiculo[0] then
+        return isCharInAnyCar(charProximo)
+    end
+    return false
+end
+
+function isClearObject(myPos, enPos) -- IGNORE OBJECT AIMBOT
+    if GUI.IgnoreObject[0] then
+        return isLineOfSightClear(myPos[1], myPos[2], myPos[3], enPos[1], enPos[2], enPos[3], true, false, false, true, false, false, false)
+    end
+    return true
+end
+
+ffi.cdef([[
+    typedef struct RwV3d {
+        float x, y, z;
+    } RwV3d;
+    void _ZN4CPed15GetBonePositionER5RwV3djb(void* thiz, RwV3d* posn, uint32_t bone, bool calledFromCam);
+]])
+
+-- FIM AIMBOT
 
 function EspLine()
     if GUI.EspLine[0] then
