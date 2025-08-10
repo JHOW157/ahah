@@ -246,10 +246,6 @@ function main()
     end
     ScriptNomeOriginal()
     sampRegisterChatCommand("menu", function()
-        if not AtivarMenu then
-            sampAddChatMessage("{FF0000}Menu desativado pelo desenvolvedor ou voce nao tem acesso a key.", -1)
-            return
-        end
         GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
     end)
 
