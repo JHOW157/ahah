@@ -1,6 +1,10 @@
 local imgui = require "mimgui"
 local new = imgui.new
 local faicons = require('fAwesome6')
+local ffi = require("ffi")
+local gtasa = ffi.load("GTASA")
+local vector3d = require("vector3d")
+local memory = require("SAMemory")
 
 -- AIMBOT
 memory.require("CCamera")
