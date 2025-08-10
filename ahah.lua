@@ -8,8 +8,6 @@ local Imagem2 = nil
 -- BOTAO
 local buttonSize
 local categoria
--- ALEATORIA
-local VerificarNomeScript = false -- VERIFICAR ALTERACAO DO NOME ARQUIVO
 -- ANIMAÇÃO DO MENU
 local LimparParticulas = {}
 for i = 1, 80 do
@@ -227,7 +225,6 @@ function main()
     while not isSampAvailable() do
         wait(100)
     end
-    ScriptNomeOriginal()
     sampRegisterChatCommand("menu", function()
         GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
     end)
@@ -236,49 +233,12 @@ function main()
         wait(50)
     end
 
-    sampAddChatMessage("{00FF00}Menu Mobile carregado com sucesso! Use /menu", -1)
+    sampAddChatMessage("{00FF00}Menu Mobile carregado com sucesso! Use /hexdump", -1)
 
     while true do
         wait(0)
     end
 end -- FIM MAIN
-
-function ScriptNomeOriginal()
-    if VerificarNomeScript then return end
-    local name = "HexDump Team Mobile.lua"
-    local currentName = thisScript().filename
-    if currentName ~= name then
-        local currentPath = thisScript().path
-        local scriptDir = currentPath:match("(.*/)")
-        if not scriptDir then
-            thisScript():unload()
-            return
-        end
-        local newPath = scriptDir .. name
-        local success = os.rename(currentPath, newPath)
-        if success then
-            thisScript():unload()
-        else
-            local sourceFile = io.open(currentPath, "rb")
-            if sourceFile then
-                local content = sourceFile:read("*all")
-                sourceFile:close()
-                local targetFile = io.open(newPath, "wb")
-                if targetFile then
-                    targetFile:write(content)
-                    targetFile:close()
-                    os.remove(currentPath)
-                    thisScript():unload()
-                else
-                    thisScript():unload()
-                end
-            else
-                thisScript():unload()
-            end
-        end
-    end
-    VerificarNomeScript = true
-end
 
 function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
     local file = io.open(path, "r")
