@@ -55,7 +55,7 @@ imgui.OnInitialize(function()
     config.MergeMode = true
     config.PixelSnapH = true
     local iconRanges = imgui.new.ImWchar[3](faicons.min_range, faicons.max_range, 0)
-    imgui.GetIO().Fonts:AddFontFromMemoryCompressedBase85TTF(faicons.get_font_data_base85('Regular'), 18, config, iconRanges)
+    imgui.GetIO().Fonts:AddFontFromMemoryCompressedBase85TTF(faicons.get_font_data_base85('Regular'), 30, config, iconRanges)
     imgui.GetIO().IniFilename = nil
     IniciarMimgui = true
     TemaVermelho() 
@@ -161,7 +161,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             end
             imgui.Text(textCredit)
             imgui.Separator()
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 20 * DPI))
             imgui.Checkbox("ESP LINE", GUI.EspLine)
         end
         if GUI.selected_category == "config" then
