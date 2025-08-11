@@ -461,5 +461,5 @@ function TemaVermelho()
     colors[clr.Button] = ImVec4(0.00, 0.00, 0.00, 0.00)
     colors[clr.ButtonHovered] = ImVec4(0.20, 0.20, 0.20, 1.00)
     colors[clr.ButtonActive] = ImVec4(0.15, 0.15, 0.15, 1.00)
-    colors[clr.CheckMark] = ImVec4(1.00, 0.00, 0.00, 1.00)
+    colors[clr.CheckMark] = ImVec4(1.00, 1.00, 1.00, 1.00)
 end
