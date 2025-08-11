@@ -112,7 +112,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
         if imgui.Button(faicons("GEAR") .. "   CONFIG              ", categoria) then
             GUI.selected_category = "config"
         end
-        imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
+        imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
 
         imgui.EndChild()
         imgui.SameLine()
@@ -462,5 +462,4 @@ function TemaVermelho()
     colors[clr.ButtonHovered] = ImVec4(0.20, 0.20, 0.20, 1.00)
     colors[clr.ButtonActive] = ImVec4(0.15, 0.15, 0.15, 1.00)
     colors[clr.CheckMark] = ImVec4(0.00, 1.00, 0.00, 1.00)
-    colors[clr.FrameBgHovered] = ImVec4(0.40, 0.00, 0.20, 0.85)
 end
