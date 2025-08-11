@@ -233,7 +233,7 @@ function main()
     while not isSampAvailable() do
         wait(100)
     end
-    sampRegisterChatCommand("menu", function()
+    sampRegisterChatCommand("hexdump", function()
         GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
     end)
 
