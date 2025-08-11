@@ -261,6 +261,7 @@ function main()
         wait(0)
         Aimbot()
         EspLine()
+        EspBoxCar()
 
         if GUI.EspCarro[0] then
             local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
@@ -269,11 +270,11 @@ function main()
                 if isCarOnScreen(i) then
                     local carX, carY, carZ = getCarCoordinates(i)
                     local px, py = convert3DCoordsToScreen(carX, carY, carZ)
-                    local thickness = 2
-                    renderDrawLine(x, y, px, py, thickness, 0xFF00FFFF)
+                    renderDrawLine(x, y, px, py, 2, 0xFFFFFFFF)
                 end
             end
         end
+
     end
 end -- FIM MAIN
 
@@ -461,6 +462,48 @@ function EspLine()
                         local lineStartY = 0
                         renderDrawLine(lineStartX, lineStartY, lineEndX, lineEndY, 2, 0xFFFF0000)
                     end
+                end
+            end
+        end
+    end
+end
+
+function EspBoxCar()
+    if GUI.EspNome[0] then
+        local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
+        local x, y = convert3DCoordsToScreen(playerX, playerY, playerZ)
+        for _, vehicle in ipairs(getAllVehicles()) do
+            if isCarOnScreen(vehicle) then
+                local carX, carY, carZ = getCarCoordinates(vehicle)
+                local px, py = convert3DCoordsToScreen(carX, carY, carZ)
+
+                local corners = {
+                    { x = 1.5, y = 3, z = 1 },
+                    { x = 1.5, y = -3, z = 1 },
+                    { x = -1.5, y = -3, z = 1 },
+                    { x = -1.5, y = 3, z = 1 },
+                    { x = 1.5, y = 3, z = -1 },
+                    { x = 1.5, y = -3, z = -1 },
+                    { x = -1.5, y = -3, z = -1 },
+                    { x = -1.5, y = 3, z = -1 }
+                }
+
+                local boxCorners = {}
+                for _, offset in ipairs(corners) do
+                    local worldX, worldY, worldZ = getOffsetFromCarInWorldCoords(vehicle, offset.x, offset.y, offset.z)
+                    local screenX, screenY = convert3DCoordsToScreen(worldX, worldY, worldZ)
+                    table.insert(boxCorners, { x = screenX, y = screenY })
+                end
+
+                for i = 1, 4 do
+                    local nextIndex = (i % 4 == 0 and i - 3) or (i + 1)
+                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, 2, 0xFFFFFFFF)
+                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[i + 4].x, boxCorners[i + 4].y, 2, 0xFFFFFFFF)
+                end
+
+                for i = 5, 8 do
+                    local nextIndex = (i % 4 == 0 and i - 3) or (i + 1)
+                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, 2, 0xFFFFFFFF)
                 end
             end
         end
