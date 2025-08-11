@@ -9,8 +9,7 @@ local memory = require("SAMemory")
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
--- ESP ESQUELETO
-local getBonePosition = ffi.cast("int (__thiscall*)(void*, float*, int, bool)", 0x5E4280)
+
 -- IMAGEM
 local Imagem = nil
 local Imagem2 = nil
@@ -38,7 +37,11 @@ local GUI = {
     IgnoreVeiculo = new.bool(false),
     IgnoreObject = new.bool(false),
     EspLine = new.bool(false),
+    EspBox = new.bool(false),
     EspEsqueleto = new.bool(false),
+    EspNome = new.bool(false),
+    EspInfoCar = new.bool(false),
+    EspCarro = new.bool(false),
     selected_category = "creditos"
 }
 
@@ -167,6 +170,14 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Checkbox(" ESP LINE", GUI.EspLine)
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             imgui.Checkbox(" ESP ESQUELETO", GUI.EspEsqueleto)
+            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Checkbox(" ESP BOX", GUI.EspBox)
+            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Checkbox(" ESP NOME", GUI.EspNome)
+            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Checkbox(" ESP INFO VEICULO", GUI.EspInfoCar)
+            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Checkbox(" ESP CARRO", GUI.EspCarro)
         end
         if GUI.selected_category == "config" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
@@ -237,6 +248,7 @@ function main()
     while not isSampAvailable() do
         wait(100)
     end
+    EnviarSmS("{00FF00}Menu Mobile carregado com sucesso! Use /hexdump", -1)
     sampRegisterChatCommand("hexdump", function()
         GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
     end)
@@ -245,24 +257,17 @@ function main()
         wait(50)
     end
 
-    sampAddChatMessage("{00FF00}Menu Mobile carregado com sucesso! Use /hexdump", -1)
-
     while true do
         wait(0)
         Aimbot()
         EspLine()
-
-        if GUI.EspEsqueleto[0] then
-            for i = 0, sampGetMaxPlayerId() do
-                local result, cped = sampGetCharHandleBySampPlayerId(i)
-                if result and doesCharExist(cped) and isCharOnScreen(cped) then
-                    Esqueleto(cped)
-                end
-            end
-        end
-
     end
 end -- FIM MAIN
+
+function EnviarSmS(text) -- TAG MESSAGEM
+    tag = '{FF0000}[JhowModsOfc]: '
+    sampAddChatMessage(tag .. text, -1)
+end
 
 -- AIMBOT
 function obterPosicaoDoOsso(id_char, id_osso)
@@ -334,7 +339,6 @@ end
 function obterCharProximoAoCentro(distanciaMaxima)
     local charsProximos = {}
     local largura, altura = getScreenResolution()
-
     for _, char in ipairs(getAllChars()) do
         if isCharOnScreen(char) and char ~= PLAYER_PED and not isCharDead(char) then
             local coordX, coordY, coordZ = getCharCoordinates(char)
@@ -360,7 +364,6 @@ function obterCharProximoAoCentro(distanciaMaxima)
         end)
         return charsProximos[1][2]
     end
-
     return nil
 end
 
@@ -428,43 +431,6 @@ ffi.cdef([[
     void _ZN4CPed15GetBonePositionER5RwV3djb(void* thiz, RwV3d* posn, uint32_t bone, bool calledFromCam);
 ]])
 -- FIM AIMBOT
-
-function Esqueleto(character)
-    local bodyParts = {3, 4, 5, 51, 52, 41, 42, 31, 32, 33, 21, 22, 23, 2}
-    
-    for i = 1, #bodyParts do
-        local pos1X, pos1Y, pos1Z = getBodyPartCoordinates(bodyParts[i], character)
-        local pos2X, pos2Y, pos2Z = getBodyPartCoordinates(bodyParts[i] + 1, character)
-        local pos1, pos2 = convert3DCoordsToScreen(pos1X, pos1Y, pos1Z)
-        local pos3, pos4 = convert3DCoordsToScreen(pos2X, pos2Y, pos2Z)
-        renderDrawLine(pos1, pos2, pos3, pos4, 2, 0xFFFF0000)
-    end
-
-    local headPosX, headPosY, headPosZ = getBodyPartCoordinates(1, character)
-    local headPosScreenX, headPosScreenY = convert3DCoordsToScreen(headPosX, headPosY, headPosZ)
-
-    for v = 4, 5 do
-        local pos2X, pos2Y, pos2Z = getBodyPartCoordinates(v * 10 + 1, character)
-        local pos3, pos4 = convert3DCoordsToScreen(pos2X, pos2Y, pos2Z)
-        renderDrawLine(headPosScreenX, headPosScreenY, pos3, pos4, 2, 0xFFFF0000)
-    end
-
-    local additionalParts = {53, 43, 24, 34, 6}
-    for _, part in ipairs(additionalParts) do
-        local posX, posY, posZ = getBodyPartCoordinates(part, character)
-        convert3DCoordsToScreen(posX, posY, posZ)
-    end
-end
-
-
-function getBodyPartCoordinates(id, handle)
-    if doesCharExist(handle) then
-        local pedptr = getCharPointer(handle)
-        local vec = ffi.new("float[3]")
-        getBonePosition(ffi.cast("void*", pedptr), vec, id, true)
-        return vec[0], vec[1], vec[2]
-    end
-end
 
 function EspLine()
     if GUI.EspLine[0] then
