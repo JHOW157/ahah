@@ -101,15 +101,15 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             end
         end
         imgui.Dummy(imgui.ImVec2(0, 50 * DPI))
-        if imgui.Button(faicons("CROSSHAIRS") .. " COMBATE            ", categoria) then
+        if imgui.Button(     faicons("CROSSHAIRS") .. " COMBATE       ", categoria) then
             GUI.selected_category = "Aimbot"
         end
         imgui.Dummy(imgui.ImVec2(0, 2 * DPI))
-        if imgui.Button(faicons("EYE") .. " VISUAL               ", categoria) then
+        if imgui.Button(     faicons("EYE") .. " VISUAL          ", categoria) then
             GUI.selected_category = "visual"
         end
         imgui.Dummy(imgui.ImVec2(0, 160 * DPI))
-        if imgui.Button(faicons("GEAR") .. " CONFIG              ", categoria) then
+        if imgui.Button(     faicons("GEAR") .. " CONFIG         ", categoria) then
             GUI.selected_category = "config"
         end
         imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
