@@ -261,6 +261,19 @@ function main()
         wait(0)
         Aimbot()
         EspLine()
+
+        if GUI.EspCarro[0] then
+            local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
+            local x, y = convert3DCoordsToScreen(playerX, playerY, playerZ)
+            for k, i in ipairs(getAllVehicles()) do
+                if isCarOnScreen(i) then
+                    local carX, carY, carZ = getCarCoordinates(i)
+                    local px, py = convert3DCoordsToScreen(carX, carY, carZ)
+                    local thickness = 2
+                    renderDrawLine(x, y, px, py, thickness, 0xFF00FFFF)
+                end
+            end
+        end
     end
 end -- FIM MAIN
 
