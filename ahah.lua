@@ -452,15 +452,15 @@ function TemaVermelho()
     local clr = imgui.Col
     local ImVec4 = imgui.ImVec4
 
-    -- Alterando vermelhos (R=1, G=0, B=0) para verdes (R=0, G=1, B=0)
-    colors[clr.Border] = ImVec4(0.00, 1.00, 0.00, 1.00)          -- Verde
-    colors[clr.Separator] = ImVec4(0.00, 1.00, 0.00, 1.00)        -- Verde
-    colors[clr.WindowBg] = ImVec4(0.05, 0.05, 0.05, 1.00)         -- Preto (mantido)
-    colors[clr.FrameBg] = ImVec4(0.00, 1.00, 0.00, 1.00)          -- Verde
-    colors[clr.TitleBg] = ImVec4(0.00, 0.00, 0.00, 0.00)          -- Transparente (mantido)
-    colors[clr.TitleBgActive] = ImVec4(0.00, 0.00, 0.00, 0.00)    -- Transparente (mantido)
-    colors[clr.Button] = ImVec4(0.00, 0.00, 0.00, 0.00)           -- Transparente (mantido)
-    colors[clr.ButtonHovered] = ImVec4(0.20, 0.20, 0.20, 1.00)    -- Cinza (mantido)
-    colors[clr.ButtonActive] = ImVec4(0.15, 0.15, 0.15, 1.00)     -- Cinza escuro (mantido)
-    colors[clr.CheckMark] = ImVec4(1.00, 1.00, 1.00, 1.00)        -- Branco (mantido)
+    colors[clr.Border] = ImVec4(1.00, 0.00, 0.00, 1.00)
+    colors[clr.Separator] = ImVec4(1.00, 0.00, 0.00, 1.00)
+    colors[clr.WindowBg] = ImVec4(0.05, 0.05, 0.05, 1.00)
+    colors[clr.FrameBg] = ImVec4(1.00, 0.00, 0.00, 1.00)
+    colors[clr.TitleBg] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.TitleBgActive] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.Button] = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.ButtonHovered] = ImVec4(0.20, 0.20, 0.20, 1.00)
+    colors[clr.ButtonActive] = ImVec4(0.15, 0.15, 0.15, 1.00)
+    colors[clr.CheckMark] = ImVec4(0.00, 1.00, 0.00, 1.00)
+    colors[clr.FrameBgHovered] = ImVec4(0.40, 0.00, 0.20, 0.85)
 end
