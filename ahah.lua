@@ -112,7 +112,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
         if imgui.Button(faicons("GEAR") .. "   CONFIG              ", categoria) then
             GUI.selected_category = "config"
         end
-        imgui.Dummy(imgui.ImVec2(0, 20 * DPI))
+        imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
 
         imgui.EndChild()
         imgui.SameLine()
