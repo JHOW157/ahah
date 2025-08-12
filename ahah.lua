@@ -120,7 +120,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             GUI.selected_category = "config"
             playSoundAtPlayerLocation()
         end
-        imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
+        imgui.Dummy(imgui.ImVec2(0, 2 * DPI))
 
         imgui.EndChild()
         imgui.SameLine()
@@ -153,11 +153,17 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             imgui.SliderFloat(" LAGURA X", GUI.LaguraX, 0.39, 0.55, "%.4f")
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            imgui.Checkbox(" IGNORE AFK", GUI.IgnoreAfkAim)
+            if imgui.Checkbox(" IGNORE AFK", GUI.IgnoreAfkAim) then
+                playSoundAtPlayerLocation()
+            end
             imgui.SameLine(320)
-            imgui.Checkbox(" IGNORE VEICULOS", GUI.IgnoreVeiculo)
+            if imgui.Checkbox(" IGNORE VEICULOS", GUI.IgnoreVeiculo) then
+                playSoundAtPlayerLocation()
+            end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            imgui.Checkbox(" IGNORE OBJETOS", GUI.IgnoreObject)
+            if imgui.Checkbox(" IGNORE OBJETOS", GUI.IgnoreObject) then
+                playSoundAtPlayerLocation()
+            end
         end
         if GUI.selected_category == "visual" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
@@ -176,13 +182,21 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 playSoundAtPlayerLocation()
             end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            imgui.Checkbox(" ESP ESQUELETO", GUI.EspEsqueleto)
+            if imgui.Checkbox(" ESP ESQUELETO", GUI.EspEsqueleto) then
+                playSoundAtPlayerLocation()
+            end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            imgui.Checkbox(" ESP BOX", GUI.EspBox)
+            if imgui.Checkbox(" ESP BOX", GUI.EspBox) then
+                playSoundAtPlayerLocation()
+            end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            imgui.Checkbox(" ESP NOME", GUI.EspNome)
+            if imgui.Checkbox(" ESP NOME", GUI.EspNome) then
+                playSoundAtPlayerLocation()
+            end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            imgui.Checkbox(" ESP INFO VEICULO", GUI.EspInfoCar)
+            if imgui.Checkbox(" ESP INFO VEICULO", GUI.EspInfoCar) then
+                playSoundAtPlayerLocation()
+            end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             if imgui.Checkbox(" ESP CARRO", GUI.EspCarro) then
                 playSoundAtPlayerLocation()
@@ -201,6 +215,9 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            if imgui.Button(" LIMPAR CHAT", buttonSize) then
+                CleanChat()
+            end
         end
         if GUI.selected_category == "creditos" then
             if Imagem2 then
@@ -504,6 +521,15 @@ function EspBoxCar()
                 renderDrawLine(x, y, px, py, 2, 0xFFFFFFFF)
             end
         end
+    end
+end
+
+function CleanChat() -- LIMPAR CHAT
+    local chatInfoPtr = sampGetChatInfoPtr()
+    if chatInfoPtr then
+        memory.fill(chatInfoPtr + 306, 0, 25200)
+        memory.write(chatInfoPtr + 306, 25562, 4, false)
+        memory.write(chatInfoPtr + 25562, 1, 1)
     end
 end
 
