@@ -579,6 +579,15 @@ function EspBox()
     end
 end
 
+function getBodyPartCoordinates(id, handle)
+    if doesCharExist(handle) then
+        local pedptr = getCharPointer(handle)
+        local vec = ffi.new("float[3]")
+        getBonePosition(ffi.cast("void*", pedptr), vec, id, true)
+        return vec[0], vec[1], vec[2]
+    end
+end
+
 function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
     local file = io.open(path, "r")
     if not file then return nil end
