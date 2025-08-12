@@ -102,6 +102,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Image(Imagem, imgui.ImVec2(200 * DPI, 200 * DPI))
             if imgui.IsItemClicked() then
                 GUI.selected_category = "creditos"
+                playSoundAtPlayerLocation()
             end
         end
         imgui.Dummy(imgui.ImVec2(0, 50 * DPI))
