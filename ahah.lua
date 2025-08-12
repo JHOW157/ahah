@@ -6,17 +6,17 @@ local gtasa = ffi.load("GTASA")
 local vector3d = require("vector3d")
 local memory = require("SAMemory")
 
+local font = renderCreateFont("Arial", 9)
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
-
 -- IMAGEM
 local Imagem = nil
 local Imagem2 = nil
 -- BOTAO
 local buttonSize
 local categoria
--- ANIMAÇÃO DO MENU
+-- ANIMACAO DO MENU
 local LimparParticulas = {}
 for i = 1, 80 do
     table.insert(LimparParticulas, {
@@ -262,6 +262,21 @@ function main()
         Aimbot()
         EspLine()
         EspBoxCar()
+
+        if GUI.EspNome[0] then
+            for i = 0, sampGetMaxPlayerId() do
+                if sampIsPlayerConnected(i) then
+                    local result, ped = sampGetCharHandleBySampPlayerId(i)
+                    if result and doesCharExist(ped) and isCharOnScreen(ped) then
+                        local pedX, pedY, pedZ = getCharCoordinates(ped)
+                        local x1, y1 = convert3DCoordsToScreen(pedX, pedY, pedZ)
+                        local textOffsetY = 20
+                        local nickname = sampGetPlayerNickname(i)
+                        renderFontDrawText(font, nickname .. " (" .. i .. ")", x1, y1 - textOffsetY, 0xFFFFFFFF)
+                    end
+                end
+            end
+        end
     end
 end -- FIM MAIN
 
