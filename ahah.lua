@@ -532,7 +532,7 @@ function CarregarMessagesLog() -- LOG DO SERVER
     if GUI.AtivarMessagesLog[0] then
         for i, MessagesLogString in ipairs(MessagesLog) do
             if FonteLog then
-                renderFontDrawText(FonteLog, MessagesLogString, 1280 * DPI, 600 * DPI + (i - 1) * 24, 0xFFff004F)
+                renderFontDrawText(FonteLog, MessagesLogString, 1320 * DPI, 600 * DPI + (i - 1) * 24, 0xFFff004F)
             end
         end
     end
