@@ -5,6 +5,7 @@ local ffi = require("ffi")
 local gtasa = ffi.load("GTASA")
 local vector3d = require("vector3d")
 local memory = require("SAMemory")
+local se = require("samp.events")
 
 -- AIMBOT
 memory.require("CCamera")
