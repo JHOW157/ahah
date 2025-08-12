@@ -9,7 +9,8 @@ local memory = require("SAMemory")
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
-
+-- ESP BOX
+local getBonePosition = ffi.cast("int (__thiscall*)(void*, float*, int, bool)", 0x5E4280)
 -- IMAGEM
 local Imagem = nil
 local Imagem2 = nil
