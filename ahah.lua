@@ -6,7 +6,6 @@ local gtasa = ffi.load("GTASA")
 local vector3d = require("vector3d")
 local memory = require("SAMemory")
 
-local AAAA = renderCreateFont("Arial", 9)
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
@@ -108,14 +107,17 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
         imgui.Dummy(imgui.ImVec2(0, 50 * DPI))
         if imgui.Button(     faicons("CROSSHAIRS") .. " COMBATE       ", categoria) then
             GUI.selected_category = "Aimbot"
+            playSoundAtPlayerLocation()
         end
         imgui.Dummy(imgui.ImVec2(0, 2 * DPI))
         if imgui.Button(     faicons("EYE") .. " VISUAL          ", categoria) then
             GUI.selected_category = "visual"
+            playSoundAtPlayerLocation()
         end
         imgui.Dummy(imgui.ImVec2(0, 160 * DPI))
         if imgui.Button(     faicons("GEAR") .. " CONFIG         ", categoria) then
             GUI.selected_category = "config"
+            playSoundAtPlayerLocation()
         end
         imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
 
@@ -262,22 +264,6 @@ function main()
         Aimbot()
         EspLine()
         EspBoxCar()
-
-        if GUI.EspNome[0] then
-            for i = 0, sampGetMaxPlayerId() do
-                if sampIsPlayerConnected(i) then
-                    local result, ped = sampGetCharHandleBySampPlayerId(i)
-                    if result and doesCharExist(ped) and isCharOnScreen(ped) then
-                        local pedX, pedY, pedZ = getCharCoordinates(ped)
-                        local x1, y1 = convert3DCoordsToScreen(pedX, pedY, pedZ)
-                        local textOffsetY = 20
-                        local nickname = sampGetPlayerNickname(i)
-                        renderFontDrawText(AAAA, nickname .. " (" .. i .. ")", x1, y1 - textOffsetY, 0xFFFFFFFF)
-                    end
-                end
-            end
-        end
-        
     end
 end -- FIM MAIN
 
@@ -520,6 +506,14 @@ function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
     local size = file:seek("end")
     file:close()
     return size
+end
+
+function playSoundAtPlayerLocation()
+    local ped = PLAYER_PED
+    if ped then
+        local x, y, z = getCharCoordinates(ped)
+        addOneOffSound(x, y, z, 1139)
+    end
 end
 
 function TemaVermelho()
