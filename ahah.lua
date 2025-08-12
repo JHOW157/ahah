@@ -115,12 +115,12 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             GUI.selected_category = "visual"
             playSoundAtPlayerLocation()
         end
-        imgui.Dummy(imgui.ImVec2(0, 160 * DPI))
+        imgui.Dummy(imgui.ImVec2(0, 150 * DPI))
         if imgui.Button(     faicons("GEAR") .. " CONFIG         ", categoria) then
             GUI.selected_category = "config"
             playSoundAtPlayerLocation()
         end
-        imgui.Dummy(imgui.ImVec2(0, 2 * DPI))
+        imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
 
         imgui.EndChild()
         imgui.SameLine()
