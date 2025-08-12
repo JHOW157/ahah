@@ -290,6 +290,7 @@ function main()
         Aimbot()
         EspLine()
         EspBoxCar()
+        CarregarMessagesLog()
     end
 end -- FIM MAIN
 
