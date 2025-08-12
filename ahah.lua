@@ -9,6 +9,7 @@ local memory = require("SAMemory")
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
+
 -- IMAGEM
 local Imagem = nil
 local Imagem2 = nil
@@ -261,7 +262,6 @@ function main()
         Aimbot()
         EspLine()
         EspBoxCar()
-        EspBox()
     end
 end -- FIM MAIN
 
@@ -493,85 +493,6 @@ function EspBoxCar()
                     renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, 2, 0xFFFFFFFF)
                 end
                 renderDrawLine(x, y, px, py, 2, 0xFFFFFFFF)
-            end
-        end
-    end
-end
-
-function EspBox()
-    if GUI.EspBox then
-        local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
-        for k, v in pairs(getAllChars()) do
-            if v ~= PLAYER_PED then
-                local pedX, pedY, pedZ = getCharCoordinates(v)
-                local result, id = sampGetPlayerIdByCharHandle(v)
-                local thickness = 1
-                if result and isCharOnScreen(v) then
-                    local color = tonumber("0xFF"..(("%X"):format(sampGetPlayerColor(id))):gsub(".*(......)", "%1"))
-                    local points = {}
-                    local radius = 0.37
-                    local upper_bone = {getBodyPartCoordinates(6, v)}
-                    local lower_y = -9999
-                    local bone
-
-                    for k, i in ipairs({43, 44, 53, 54}) do
-                        local x, y = convert3DCoordsToScreen(getBodyPartCoordinates(i, v))
-                        if y > lower_y then
-                            lower_y = y
-                            bone = i
-                        end
-                    end
-
-                    local lower_bone = {getBodyPartCoordinates(bone, v)}
-
-                    for rot = 0, 360 do
-                        local rot_temp = math.rad(rot)
-                        local lineX, lineY = radius * math.cos(rot_temp), radius * math.sin(rot_temp)
-                        table.insert(points, {convert3DCoordsToScreen(getOffsetFromCharInWorldCoords(v, lineX, 0.05 + lineY, upper_bone[3] - pedZ + 0.15))})
-                        table.insert(points, {convert3DCoordsToScreen(getOffsetFromCharInWorldCoords(v, lineX, 0.05 + lineY, lower_bone[3] - pedZ - 0.05))})
-                    end
-
-                    local sort_points = {}
-                    for i = 1, 4 do
-                        local leading = i % 2 == 0 and 0 or 9999
-                        local g = (i == 1 or i == 2) and 2 or 1
-                        if i == 1 or i == 3 then
-                            for _, c in ipairs(points) do
-                                if c[g] < leading then
-                                    leading = c[g]
-                                end
-                            end
-                        else
-                            for _, c in ipairs(points) do
-                                if c[g] > leading then
-                                    leading = c[g]
-                                end
-                            end
-                        end
-                        table.insert(sort_points, leading)
-                    end
-                     
-                    local corners = {
-                        {sort_points[3], sort_points[1]},
-                        {sort_points[3] + (sort_points[4] - sort_points[3]) / 4, sort_points[1]},
-                        {sort_points[4] - (sort_points[4] - sort_points[3]) / 4, sort_points[1]},
-                        {sort_points[4], sort_points[1]},
-                        {sort_points[4], sort_points[1] + (sort_points[2] - sort_points[1]) / 4},
-                        {sort_points[4], sort_points[2] - (sort_points[2] - sort_points[1]) / 4},
-                        {sort_points[4], sort_points[2]},
-                        {sort_points[4] - (sort_points[4] - sort_points[3]) / 4, sort_points[2]},
-                        {sort_points[3] + (sort_points[4] - sort_points[3]) / 4, sort_points[2]},
-                        {sort_points[3], sort_points[2]},
-                        {sort_points[3], sort_points[2] - (sort_points[2] - sort_points[1]) / 4},
-                        {sort_points[3], sort_points[1] + (sort_points[2] - sort_points[1]) / 4},
-                    }
-                    for k = 1, #corners do
-                        if k ~= 2 and k ~= 5 and k ~= 8 and k ~= 11 then
-                            local kk = k ~= #corners and k + 1 or 1
-                            renderDrawLine(corners[k][1], corners[k][2], corners[kk][1], corners[kk][2], thickness, color)
-                        end
-                    end
-                end
             end
         end
     end
