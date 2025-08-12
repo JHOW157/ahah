@@ -102,6 +102,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Image(Imagem, imgui.ImVec2(200 * DPI, 200 * DPI))
             if imgui.IsItemClicked() then
                 GUI.selected_category = "creditos"
+                playSoundAtPlayerLocation()
             end
         end
         imgui.Dummy(imgui.ImVec2(0, 50 * DPI))
@@ -508,10 +509,10 @@ function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
     return size
 end
 
-function playSoundAtPlayerLocation()
-    local ped = PLAYER_PED
-    if ped then
-        local x, y, z = getCharCoordinates(ped)
+function playSoundAtPlayerLocation() -- SOM
+    local som = PLAYER_PED
+    if som then
+        local x, y, z = getCharCoordinates(som)
         addOneOffSound(x, y, z, 1139)
     end
 end
