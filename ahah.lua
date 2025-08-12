@@ -6,7 +6,7 @@ local gtasa = ffi.load("GTASA")
 local vector3d = require("vector3d")
 local memory = require("SAMemory")
 
-local font = renderCreateFont("Arial", 9)
+local AAAA = renderCreateFont("Arial", 9)
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
@@ -272,11 +272,12 @@ function main()
                         local x1, y1 = convert3DCoordsToScreen(pedX, pedY, pedZ)
                         local textOffsetY = 20
                         local nickname = sampGetPlayerNickname(i)
-                        renderFontDrawText(font, nickname .. " (" .. i .. ")", x1, y1 - textOffsetY, 0xFFFFFFFF)
+                        renderFontDrawText(AAAA, nickname .. " (" .. i .. ")", x1, y1 - textOffsetY, 0xFFFFFFFF)
                     end
                 end
             end
         end
+        
     end
 end -- FIM MAIN
 
