@@ -262,19 +262,6 @@ function main()
         Aimbot()
         EspLine()
         EspBoxCar()
-
-        if GUI.EspCarro[0] then
-            local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
-            local x, y = convert3DCoordsToScreen(playerX, playerY, playerZ)
-            for k, i in ipairs(getAllVehicles()) do
-                if isCarOnScreen(i) then
-                    local carX, carY, carZ = getCarCoordinates(i)
-                    local px, py = convert3DCoordsToScreen(carX, carY, carZ)
-                    renderDrawLine(x, y, px, py, 2, 0xFFFFFFFF)
-                end
-            end
-        end
-
     end
 end -- FIM MAIN
 
@@ -469,7 +456,7 @@ function EspLine()
 end
 
 function EspBoxCar()
-    if GUI.EspNome[0] then
+    if GUI.EspCarro[0] then
         local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
         local x, y = convert3DCoordsToScreen(playerX, playerY, playerZ)
         for _, vehicle in ipairs(getAllVehicles()) do
@@ -505,6 +492,7 @@ function EspBoxCar()
                     local nextIndex = (i % 4 == 0 and i - 3) or (i + 1)
                     renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, 2, 0xFFFFFFFF)
                 end
+                renderDrawLine(x, y, px, py, 2, 0xFFFFFFFF)
             end
         end
     end
