@@ -9,6 +9,9 @@ local memory = require("SAMemory")
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
+-- LOG DO SERVER
+local MessagesLog = {}
+local FonteLog = renderCreateFont("Arial", 12, 0)
 -- IMAGEM
 local Imagem = nil
 local Imagem2 = nil
@@ -41,6 +44,7 @@ local GUI = {
     EspNome = new.bool(false),
     EspInfoCar = new.bool(false),
     EspCarro = new.bool(false),
+    AtivarMessagesLog = new.bool(false),
     selected_category = "creditos"
 }
 
@@ -215,6 +219,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Checkbox(" LOG SERVIDOR", GUI.AtivarMessagesLog)
         end
         if GUI.selected_category == "creditos" then
             if Imagem2 then
@@ -520,6 +525,44 @@ function EspBoxCar()
         end
     end
 end
+
+function CarregarMessagesLog() -- LOG DO SERVER
+    if GUI.AtivarMessagesLog[0] then
+        for i, MessagesLogString in ipairs(MessagesLog) do
+            if FonteLog then
+                renderFontDrawText(FonteLog, MessagesLogString, 1480, 600 + (i - 1) * 24, 0xFFff004F)
+            end
+        end
+    end
+end
+
+function se.onPlayerJoin(playerId, color, isNpc, nick)
+    local MessagesLogString = string.format("{FFFFFF}%s[%d]{80FF00} ENTROU NO SERVER", nick, playerId)
+    table.insert(MessagesLog, 1, MessagesLogString)
+    if #MessagesLog > 6 then
+        table.remove(MessagesLog, #MessagesLog)
+    end
+end
+
+function se.onPlayerQuit(playerId, LRas)
+    local nick = sampGetPlayerNickname(playerId)
+    local LRasText = LOGSERVERMESS()
+    local MessagesLogString = string.format("{FFFFFF}%s[%d]{FF0004} %s{FFFFFF}", nick, playerId, LRasText)
+    table.insert(MessagesLog, 1, MessagesLogString)
+    if #MessagesLog > 6 then
+        table.remove(MessagesLog, #MessagesLog)
+    end
+end
+
+function LOGSERVERMESS()
+    local NomeLog = {
+        [0] = "SAIU DO SERVER",
+        [1] = "KICKADO",
+        [2] = "SEM NET",
+        [3] = "BANIDO"
+    }
+    return NomeLog[NomeLog] or "SAIU DO SERVER"
+end -- FIM LOG DO SERVER
 
 function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
     local file = io.open(path, "r")
