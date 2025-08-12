@@ -215,9 +215,6 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            if imgui.Button(" LIMPAR CHAT", buttonSize) then
-                CleanChat()
-            end
         end
         if GUI.selected_category == "creditos" then
             if Imagem2 then
@@ -521,15 +518,6 @@ function EspBoxCar()
                 renderDrawLine(x, y, px, py, 2, 0xFFFFFFFF)
             end
         end
-    end
-end
-
-function CleanChat() -- LIMPAR CHAT
-    local chatInfoPtr = sampGetChatInfoPtr()
-    if chatInfoPtr then
-        memory.fill(chatInfoPtr + 306, 0, 25200)
-        memory.write(chatInfoPtr + 306, 25562, 4, false)
-        memory.write(chatInfoPtr + 25562, 1, 1)
     end
 end
 
