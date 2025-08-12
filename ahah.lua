@@ -27,9 +27,9 @@ end
 local GUI = {
     AbrirMenu = imgui.new.bool(false),
     AtivarAimbot = new.bool(false),
-    FovAimbot = new.float(1),
+    FovAimbot = new.float(100),
     SuavidadeAimbot = new.float(100),
-    DistanciaAimbot = new.float(20),
+    DistanciaAimbot = new.float(100),
     AlturaY = new.float(0.4381),
     LaguraX = new.float(0.5211),
     IgnoreAfkAim = new.bool(false),
