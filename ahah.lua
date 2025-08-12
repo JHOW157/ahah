@@ -62,7 +62,7 @@ imgui.OnInitialize(function()
     imgui.GetIO().Fonts:AddFontFromMemoryCompressedBase85TTF(faicons.get_font_data_base85('Regular'), 20 * DPI, config, iconRanges)
     imgui.GetIO().IniFilename = nil
     IniciarMimgui = true
-    TemaVermelho()
+    TemaVermelho() 
     local Foto1 = getWorkingDirectory() .. "/JhowModsOfc/Menu Mobile/HexDumpTeam.png"
     if CarregarFoto(Foto1) then
         Imagem = imgui.CreateTextureFromFile(Foto1)
@@ -115,7 +115,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             GUI.selected_category = "visual"
             playSoundAtPlayerLocation()
         end
-        imgui.Dummy(imgui.ImVec2(0, 170 * DPI))
+        imgui.Dummy(imgui.ImVec2(0, 160 * DPI))
         if imgui.Button(     faicons("GEAR") .. " CONFIG         ", categoria) then
             GUI.selected_category = "config"
             playSoundAtPlayerLocation()
@@ -139,7 +139,9 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 20 * DPI))
-            imgui.Checkbox(" ATIVAR AIMBOT", GUI.AtivarAimbot)
+            if imgui.Checkbox(" ATIVAR AIMBOT", GUI.AtivarAimbot) then
+                playSoundAtPlayerLocation()
+            end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             imgui.SliderFloat(" FOV AIMBOT", GUI.FovAimbot, 1, 100, "%.4f")
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
@@ -170,7 +172,9 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 20 * DPI))
-            imgui.Checkbox(" ESP LINE", GUI.EspLine)
+            if imgui.Checkbox(" ESP LINE", GUI.EspLine) then
+                playSoundAtPlayerLocation()
+            end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             imgui.Checkbox(" ESP ESQUELETO", GUI.EspEsqueleto)
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
@@ -180,7 +184,9 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             imgui.Checkbox(" ESP INFO VEICULO", GUI.EspInfoCar)
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            imgui.Checkbox(" ESP CARRO", GUI.EspCarro)
+            if imgui.Checkbox(" ESP CARRO", GUI.EspCarro) then
+                playSoundAtPlayerLocation()
+            end
         end
         if GUI.selected_category == "config" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
