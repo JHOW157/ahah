@@ -59,10 +59,10 @@ imgui.OnInitialize(function()
     config.MergeMode = true
     config.PixelSnapH = true
     local iconRanges = imgui.new.ImWchar[3](faicons.min_range, faicons.max_range, 0)
-    imgui.GetIO().Fonts:AddFontFromMemoryCompressedBase85TTF(faicons.get_font_data_base85('Regular'), 30, config, iconRanges)
+    imgui.GetIO().Fonts:AddFontFromMemoryCompressedBase85TTF(faicons.get_font_data_base85('Regular'), 20 * DPI, config, iconRanges)
     imgui.GetIO().IniFilename = nil
     IniciarMimgui = true
-    TemaVermelho() 
+    TemaVermelho()
     local Foto1 = getWorkingDirectory() .. "/JhowModsOfc/Menu Mobile/HexDumpTeam.png"
     if CarregarFoto(Foto1) then
         Imagem = imgui.CreateTextureFromFile(Foto1)
