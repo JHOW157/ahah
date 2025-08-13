@@ -143,21 +143,21 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             end
             imgui.Text(textCredit)
             imgui.Separator()
-            imgui.Dummy(imgui.ImVec2(0, 20 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" ATIVAR AIMBOT", GUI.AtivarAimbot) then
                 playSoundAtPlayerLocation()
             end
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             imgui.SliderFloat(" FOV AIMBOT", GUI.FovAimbot, 1, 100, "%.4f")
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             imgui.SliderFloat(" SUAVIDADE", GUI.SuavidadeAimbot, 1, 100, "%.4f")
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             imgui.SliderFloat(" DISTANCIA", GUI.DistanciaAimbot, 1, 100, "%.4f")
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             imgui.SliderFloat(" ALTURA Y", GUI.AlturaY, 0.39, 0.55, "%.4f")
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             imgui.SliderFloat(" LAGURA X", GUI.LaguraX, 0.39, 0.55, "%.4f")
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" IGNORE AFK", GUI.IgnoreAfkAim) then
                 playSoundAtPlayerLocation()
             end
@@ -165,7 +165,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             if imgui.Checkbox(" IGNORE VEICULOS", GUI.IgnoreVeiculo) then
                 playSoundAtPlayerLocation()
             end
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" IGNORE OBJETOS", GUI.IgnoreObject) then
                 playSoundAtPlayerLocation()
             end
@@ -182,27 +182,27 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             end
             imgui.Text(textCredit)
             imgui.Separator()
-            imgui.Dummy(imgui.ImVec2(0, 20 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" ESP LINE", GUI.EspLine) then
                 playSoundAtPlayerLocation()
             end
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP ESQUELETO", GUI.EspEsqueleto) then
                 playSoundAtPlayerLocation()
             end
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP BOX", GUI.EspBox) then
                 playSoundAtPlayerLocation()
             end
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP NOME", GUI.EspNome) then
                 playSoundAtPlayerLocation()
             end
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP INFO VEICULO", GUI.EspInfoCar) then
                 playSoundAtPlayerLocation()
             end
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP CARRO", GUI.EspCarro) then
                 playSoundAtPlayerLocation()
             end
@@ -219,7 +219,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             end
             imgui.Text(textCredit)
             imgui.Separator()
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             imgui.Checkbox(" LOG SERVIDOR", GUI.AtivarMessagesLog)
         end
         if GUI.selected_category == "creditos" then
