@@ -311,14 +311,11 @@ function main()
     end
     EnviarSmS("{00FF00}Menu Mobile carregado com sucesso! Use /hexdump", -1)
 
-    while not IniciarMimgui do
-        wait(50)
-    end
-
     while true do
-    if isWidgetSwipedRight(WIDGET_RADAR) then
-      GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
-    end
+        if isWidgetSwipedLeft(WIDGET_RADAR) then
+            GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
+        end
+
         wait(0)
         Aimbot()
         EspLine()
