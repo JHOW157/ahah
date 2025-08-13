@@ -1,14 +1,14 @@
-local imgui = require "mimgui"
+local imgui = require "LibJhowMods.mimgui"
 local new = imgui.new
-local faicons = require('fAwesome6')
-local ffi = require("ffi")
-local gtasa = ffi.load("GTASA")
-local vector3d = require("vector3d")
-local memory = require("SAMemory")
-local se = require("samp.events")
+local faicons = require('LibJhowMods.fAwesome6')
+local ffi = require("LibJhowMods.ffi")
+local gtasa = ffi.load("LibJhowMods.GTASA")
+local vector3d = require("LibJhowMods.vector3d")
+local memory = require("LibJhowMods.SAMemory")
+local se = require("LibJhowMods.samp.events")
 
 -- AIMBOT
-memory.require("CCamera")
+memory.require("LibJhowMods.CCamera")
 local camera_principal = memory.camera
 -- LOG DO SERVER
 local MessagesLog = {}
