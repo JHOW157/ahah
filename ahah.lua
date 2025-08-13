@@ -1,5 +1,6 @@
 local imgui = require "mimgui"
 local new = imgui.new
+local widgets = require("widgets")
 local faicons = require('fAwesome6')
 local ffi = require("ffi")
 local gtasa = ffi.load("GTASA")
@@ -46,8 +47,8 @@ local GUI = {
     EspInfoCar = new.bool(false),
     EspCarro = new.bool(false),
     AtivarMessagesLog = new.bool(false),
-    AlterarFovTela = new.int(40),
     AtivarTelaEsticada = new.bool(false),
+    AlterarFovTela = new.int(60),
     selected_category = "creditos"
 }
 
@@ -127,7 +128,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             GUI.selected_category = "visual"
             playSoundAtPlayerLocation()
         end
-        imgui.Dummy(imgui.ImVec2(0, 90 * DPI))
+        imgui.Dummy(imgui.ImVec2(0, 85 * DPI))
         if imgui.Button(     faicons("GEAR") .. " CONFIG         ", categoria) then
             GUI.selected_category = "config"
             playSoundAtPlayerLocation()
@@ -309,9 +310,10 @@ function main()
         wait(100)
     end
     EnviarSmS("{00FF00}Menu Mobile carregado com sucesso! Use /hexdump", -1)
-    sampRegisterChatCommand("hexdump", function()
-        GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
-    end)
+
+    if isWidgetSwipedLeft(WIDGET_FIST) then
+      GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
+    end
 
     while not IniciarMimgui do
         wait(50)
