@@ -316,11 +316,9 @@ function main()
     end
 
     while true do
-        
-    if isWidgetSwipedLeft(WIDGET_RADAR) then
+    if isWidgetSwipedRight(WIDGET_RADAR) then
       GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
     end
-
         wait(0)
         Aimbot()
         EspLine()
