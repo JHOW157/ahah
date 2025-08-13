@@ -127,7 +127,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             GUI.selected_category = "visual"
             playSoundAtPlayerLocation()
         end
-        imgui.Dummy(imgui.ImVec2(0, 100 * DPI))
+        imgui.Dummy(imgui.ImVec2(0, 90 * DPI))
         if imgui.Button(     faicons("GEAR") .. " CONFIG         ", categoria) then
             GUI.selected_category = "config"
             playSoundAtPlayerLocation()
@@ -151,8 +151,11 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
-            imgui.Checkbox("ATIVAR FOV", GUI.AtivarTelaEsticada)
-            if imgui.SliderInt("AJUSTAR FOV", GUI.AlterarFovTela, 10, 120) then
+            if imgui.Checkbox(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
+                playSoundAtPlayerLocation()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+            if imgui.SliderInt(" AJUSTAR FOV", GUI.AlterarFovTela, 10, 120) then
                 if GUI.AtivarTelaEsticada[0] then
                     cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
                 end
@@ -319,6 +322,7 @@ function main()
         Aimbot()
         EspLine()
         EspBoxCar()
+        TelaEsticada()
         CarregarMessagesLog()
     end
 end -- FIM MAIN
