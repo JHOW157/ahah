@@ -46,6 +46,7 @@ local GUI = {
     EspInfoCar = new.bool(false),
     EspCarro = new.bool(false),
     AtivarMessagesLog = new.bool(false),
+    AlterarFovTela = new.int(40),
     selected_category = "creditos"
 }
 
@@ -111,6 +112,11 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             end
         end
         imgui.Dummy(imgui.ImVec2(0, 50 * DPI))
+        if imgui.Button(     faicons("USER") .. " JOGADOR       ", categoria) then
+            GUI.selected_category = "Jogador"
+            playSoundAtPlayerLocation()
+        end
+        imgui.Dummy(imgui.ImVec2(0, 2 * DPI))
         if imgui.Button(     faicons("CROSSHAIRS") .. " COMBATE       ", categoria) then
             GUI.selected_category = "Aimbot"
             playSoundAtPlayerLocation()
@@ -131,6 +137,26 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
         imgui.SameLine()
 
         imgui.BeginChild("RightPane", imgui.ImVec2(0, 0), false)
+        if GUI.selected_category == "Jogador" then
+            imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
+            imgui.Separator()
+            local textCredit = "JOGADORES"
+            local textWidth = imgui.CalcTextSize(textCredit).x
+            local leftPaneWidth = 220 * DPI
+            local padding = 400 * DPI
+            if leftPaneWidth and textWidth then
+                imgui.SetCursorPosX((leftPaneWidth - textWidth) / 2 + padding / 2)
+            end
+            imgui.Text(textCredit)
+            imgui.Separator()
+            imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
+            if imgui.SliderInt("AJUSTAR FOV", GUI.AlterarFovTela, 10, 120) then
+                if GUI.AtivarTelaEsticada[0] then
+                    cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
+                end
+            end
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+        end
         if GUI.selected_category == "Aimbot" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
             imgui.Separator()
@@ -462,6 +488,12 @@ ffi.cdef([[
     void _ZN4CPed15GetBonePositionER5RwV3djb(void* thiz, RwV3d* posn, uint32_t bone, bool calledFromCam);
 ]])
 -- FIM AIMBOT
+
+function TelaEsticada() -- FOV TELA
+    if GUI.AtivarTelaEsticada[0] then
+        cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
+    end
+end
 
 function EspLine()
     if GUI.EspLine[0] then
