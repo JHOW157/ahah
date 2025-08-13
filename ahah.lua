@@ -311,7 +311,7 @@ function main()
     end
     EnviarSmS("{00FF00}Menu Mobile carregado com sucesso! Use /hexdump", -1)
 
-    if isWidgetSwipedLeft(WIDGET_FIST) then
+    if isWidgetSwipedLeft(WIDGET_RADAR) then
       GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
     end
 
