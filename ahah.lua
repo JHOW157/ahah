@@ -85,7 +85,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
     DPI = getDPIScale() * ui_scale[0]
     buttonSize = imgui.ImVec2(360 * DPI, 60 * DPI)
     categoria = imgui.ImVec2(-1, 75 * DPI)
-    imgui.SetNextWindowPos(imgui.ImVec2(300 * DPI, 120 * DPI), imgui.Cond.FirstUseEver)
+    imgui.SetNextWindowPos(imgui.ImVec2(320 * DPI, 100 * DPI), imgui.Cond.FirstUseEver)
     imgui.SetNextWindowSize(imgui.ImVec2(960 * DPI, 720 * DPI), imgui.Cond.Always)
     local windowFlags = bit.bor(imgui.WindowFlags.NoCollapse, imgui.WindowFlags.NoResize, imgui.WindowFlags.NoTitleBar)
 
