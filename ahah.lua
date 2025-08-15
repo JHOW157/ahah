@@ -587,6 +587,18 @@ function se.onChatMessage(playerId, text)
             sampSendChat("/fila")
         end
     end
+end
+
+function se.onShowDialog(id, style, title, button1, button2, text)
+    if GUI.AutoFila[0] then
+        local ttitle = string.lower(u8:decode(title))
+        if ttitle:find("Fila de Atendimento") then
+            lua_thread.create(function()
+                wait(0)
+                sampSendDialogResponse(id, 1, 0, "")
+            end)
+        end
+    end
 end -- FIM AUTO FILA
 
 function CarregarMessagesLog() -- LOG DO SERVER
