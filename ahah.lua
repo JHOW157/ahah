@@ -7,6 +7,9 @@ local gtasa = ffi.load("GTASA")
 local vector3d = require("vector3d")
 local memory = require("SAMemory")
 local se = require("samp.events")
+local encoding = require("encoding")
+encoding.default = "CP1251"
+local u8 = encoding.UTF8
 
 -- AIMBOT
 memory.require("CCamera")
@@ -32,6 +35,7 @@ end
 local GUI = {
     AbrirMenu = imgui.new.bool(false),
     AtivarAimbot = new.bool(false),
+    AutoFila = new.bool(false),
     FovAimbot = new.float(100),
     SuavidadeAimbot = new.float(100),
     DistanciaAimbot = new.float(100),
@@ -162,6 +166,9 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 end
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+            if imgui.Checkbox(" ATIVAR AUTO FILA", GUI.AutoFila) then
+                playSoundAtPlayerLocation()
+            end
         end
         if GUI.selected_category == "Aimbot" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
@@ -499,7 +506,7 @@ function TelaEsticada() -- FOV TELA
     end
 end
 
-function EspLine()
+function EspLine() -- ESP LINE
     if GUI.EspLine[0] then
         local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
         for playerId = 0, sampGetMaxPlayerId(false) do
@@ -521,7 +528,7 @@ function EspLine()
     end
 end
 
-function EspBoxCar()
+function EspBoxCar() -- ESP CAR BOX
     if GUI.EspCarro[0] then
         local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
         local x, y = convert3DCoordsToScreen(playerX, playerY, playerZ)
@@ -563,6 +570,24 @@ function EspBoxCar()
         end
     end
 end
+
+function se.onServerMessage(color, text) -- AUTO FILA
+    if GUI.AutoFila[0] then
+        local lowerText = string.lower(u8:decode(text))
+        if lowerText:find("fila") or lowerText:find("/fila") then
+            sampSendChat("/mundo 0")
+        end
+    end
+end
+
+function se.onChatMessage(playerId, text)
+    if GUI.AutoFila[0] then
+        local lowerText = string.lower(u8:decode(text))
+        if lowerText:find("fila") or lowerText:find("/fila") then
+            sampSendChat("/mundo 0")
+        end
+    end
+end -- FIM AUTO FILA
 
 function CarregarMessagesLog() -- LOG DO SERVER
     if GUI.AtivarMessagesLog[0] then
