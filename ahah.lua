@@ -156,18 +156,18 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
-            if imgui.Checkbox(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
+            if imgui.Checkbox(" ATIVAR AUTO FILA (ADM)", GUI.AutoFila) then
                 playSoundAtPlayerLocation()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+            if imgui.Checkbox(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
+                playSoundAtPlayerLocation()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             if imgui.SliderInt(" AJUSTAR FOV", GUI.AlterarFovTela, 10, 120) then
                 if GUI.AtivarTelaEsticada[0] then
                     cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
                 end
-            end
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" ATIVAR AUTO FILA", GUI.AutoFila) then
-                playSoundAtPlayerLocation()
             end
         end
         if GUI.selected_category == "Aimbot" then
@@ -575,7 +575,7 @@ function se.onServerMessage(color, text) -- AUTO FILA
     if GUI.AutoFila[0] then
         local lowerText = string.lower(u8:decode(text))
         if lowerText:find("fila") or lowerText:find("/fila") then
-            sampSendChat("/mundo 0")
+            sampSendChat("/fila")
         end
     end
 end
@@ -584,7 +584,7 @@ function se.onChatMessage(playerId, text)
     if GUI.AutoFila[0] then
         local lowerText = string.lower(u8:decode(text))
         if lowerText:find("fila") or lowerText:find("/fila") then
-            sampSendChat("/mundo 0")
+            sampSendChat("/fila")
         end
     end
 end -- FIM AUTO FILA
