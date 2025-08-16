@@ -11,8 +11,8 @@ local encoding = require("encoding")
 encoding.default = "CP1251"
 local u8 = encoding.UTF8
 
-local font = renderCreateFont("Arial", 9, 12)
-
+-- FONTE ESP CARRO
+local EspFontCar = renderCreateFont("Arial", 12, 9)
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
@@ -333,37 +333,29 @@ function main()
         EspBoxCar()
         TelaEsticada()
         CarregarMessagesLog()
-        espinfo()
+        EspInforVeiculos()
     end
 end -- FIM MAIN
 
-function espinfo()
+function EspInforVeiculos() -- ESP INFO VEICULO
     if GUI.EspInfoCar[0] then
         local px, py, pz = getCharCoordinates(PLAYER_PED)
-
         for _, v in ipairs(getAllVehicles()) do   
             if v and isCarOnScreen(v) then 
                 local carX, carY, carZ = getCarCoordinates(v)        
                 local dist = getDistanceBetweenCoords3d(px, py, pz, carX, carY, carZ)
-
-                if dist < 150.0 then -- limite de distância
+                if dist < 150.0 then
                     local carId = getCarModel(v)
                     local nomeModelo = carros[carId - 399] or "DESCONHECIDO"
                     local _, vehicleServerId = sampGetVehicleIdByCarHandle(v)
                     local hp = getCarHealth(v)
                     local X, Y = convert3DCoordsToScreen(carX, carY, carZ + 1)
-
-                    local infoText = string.format("MODELO: %s | ID: %d | HP: %.0f", nomeModelo, vehicleServerId, hp)
-                    renderFontDrawText(font, infoText, X, Y, 0xFFFF0000)
+                    local infoText = string.format("%s (%d) \n\nHP: %.0f", nomeModelo, vehicleServerId, hp)
+                    renderFontDrawText(EspFontCar, infoText, X, Y, 0xFFFF0000)
                 end
             end
         end
     end
-end
-
-function EnviarSmS(text) -- TAG MESSAGEM
-    tag = '{FF0000}[JhowModsOfc]: '
-    sampAddChatMessage(tag .. text, -1)
 end
 
 -- AIMBOT
@@ -623,19 +615,25 @@ function se.onShowDialog(id, style, title, button1, button2, text)
         local ttitle = string.lower(u8:decode(title))
         if ttitle:find("fila de atendimento") then
             lua_thread.create(function()
-                wait(20)
+                wait(0)
                 local firstLine = text:match("^(.-)\n") or text
                 if firstLine ~= "" then
                     sampSendDialogResponse(id, 1, 0, firstLine)
                     wait(100)
                     sampSendDialogResponse(id, 0, 0, "")
-                    require("memory").setint32(sampGetDialogInfoPtr() + 40, 0, true)
                     playSoundAtPlayerLocation()
+                    wait(250)
+                    return false
                 end
             end)
         end
     end
 end -- FIM AUTO FILA
+
+function EnviarSmS(text) -- TAG MESSAGEM
+    tag = '{FF0000}[JhowModsOfc]: '
+    sampAddChatMessage(tag .. text, -1)
+end
 
 function CarregarMessagesLog() -- LOG DO SERVER
     if GUI.AtivarMessagesLog[0] then
