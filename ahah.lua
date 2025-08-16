@@ -594,11 +594,11 @@ function se.onShowDialog(id, style, title, button1, button2, text)
         local ttitle = string.lower(u8:decode(title))
         if ttitle:find("fila de atendimento") then
             lua_thread.create(function()
-                wait(300)
+                wait(20)
                 local firstLine = text:match("^(.-)\n") or text
                 if firstLine ~= "" then
                     sampSendDialogResponse(id, 1, 0, firstLine)
-                else
+                    wait(200)
                     sampSendDialogResponse(id, 1, 0, "")
                 end
             end)
