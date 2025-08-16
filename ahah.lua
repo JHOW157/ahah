@@ -599,10 +599,9 @@ function se.onShowDialog(id, style, title, button1, button2, text)
                 if firstLine ~= "" then
                     sampSendDialogResponse(id, 1, 0, firstLine)
                     wait(100)
-                    sampSendDialogResponse(id, 1, 0, "")
+                    sampSendDialogResponse(id, 0, 0, "")
+                    require("memory").setint32(sampGetDialogInfoPtr() + 40, 0, true)
                     playSoundAtPlayerLocation()
-                    require("memory").setint32(sampGetDialogInfoPtr() + 40, ativar and 1 or 0, true)
-                    sampToggleCursor(ativar)
                 end
             end)
         end
