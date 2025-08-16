@@ -589,7 +589,7 @@ function se.onChatMessage(playerId, text)
     end
 end
 
-function sampev.onShowDialog(id, style, title, button1, button2, text)
+function se.onShowDialog(id, style, title, button1, button2, text)
     if GUI.AutoFila[0] then
         local ttitle = string.lower(u8:decode(title))
         if ttitle:find("fila de atendimento") then
