@@ -12,8 +12,6 @@ encoding.default = "CP1251"
 local u8 = encoding.UTF8
 
 local bones = { 3, 4, 5, 51, 52, 41, 42, 31, 32, 33, 21, 22, 23, 2 }
-ffi.cdef("typedef struct RwV3d { float x; float y; float z; } RwV3d; void _ZN4CPed15GetBonePositionER5RwV3djb(void* thiz, RwV3d* posn, uint32_t bone, bool calledFromCam);")
-ffi.cdef([[ void _Z12AND_OpenLinkPKc(const char* link); ]])
 
 -- AIMBOT
 memory.require("CCamera")
