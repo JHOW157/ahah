@@ -615,7 +615,7 @@ function se.onShowDialog(id, style, title, button1, button2, text)
         local ttitle = string.lower(u8:decode(title))
         if ttitle:find("fila de atendimento") then
             lua_thread.create(function()
-                wait(0)
+                wait(50)
                 local firstLine = text:match("^(.-)\n") or text
                 if firstLine ~= "" then
                     sampSendDialogResponse(id, 1, 0, firstLine)
@@ -628,6 +628,7 @@ function se.onShowDialog(id, style, title, button1, button2, text)
                     playSoundAtPlayerLocation()
                 end
             end)
+            return false
         end
     end
 end -- FIM AUTO FILA
