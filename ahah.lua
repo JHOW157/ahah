@@ -11,6 +11,10 @@ local encoding = require("encoding")
 encoding.default = "CP1251"
 local u8 = encoding.UTF8
 
+local bones = { 3, 4, 5, 51, 52, 41, 42, 31, 32, 33, 21, 22, 23, 2 }
+ffi.cdef("typedef struct RwV3d { float x; float y; float z; } RwV3d; void _ZN4CPed15GetBonePositionER5RwV3djb(void* thiz, RwV3d* posn, uint32_t bone, bool calledFromCam);")
+ffi.cdef([[ void _Z12AND_OpenLinkPKc(const char* link); ]])
+
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
@@ -329,8 +333,50 @@ function main()
         EspBoxCar()
         TelaEsticada()
         CarregarMessagesLog()
+
+        if GUI.EspEsqueleto[0] then
+            drawSkeletonESP()
+        end
+        
     end
 end -- FIM MAIN
+
+function drawSkeletonESP()
+    local playerPed = PLAYER_PED
+    local px, py, pz = getCharCoordinates(playerPed)
+
+    local function convertColorToHex(color)
+        local r = math.floor(color[0] * 255)
+        local g = math.floor(color[1] * 255)
+        local b = math.floor(color[2] * 255)
+        local a = math.floor(color[3] * 255)
+        return (a * 16777216) + (r * 65536) + (g * 256) + b
+    end
+
+    for _, char in ipairs(getAllChars()) do
+        if char ~= playerPed then
+            local result, id = sampGetPlayerIdByCharHandle(char)
+            if result and isCharOnScreen(char) then
+                for _, bone in ipairs(bones) do
+                    local x1, y1, z1 = getBonePosition(char, bone)
+                    local x2, y2, z2 = getBonePosition(char, bone + 1)
+                    local r1, sx1, sy1 = convert3DCoordsToScreenEx(x1, y1, z1)
+                    local r2, sx2, sy2 = convert3DCoordsToScreenEx(x2, y2, z2)
+                    if r1 and r2 then
+                        renderDrawLine(sx1, sy1, sx2, sy2, 3, 0xFFFF0000)
+                    end
+                end
+            end
+        end
+    end
+end
+
+function getBonePosition(ped, bone)
+  local pedptr = ffi.cast('void*', getCharPointer(ped))
+  local posn = ffi.new('RwV3d[1]')
+  gtasa._ZN4CPed15GetBonePositionER5RwV3djb(pedptr, posn, bone, false)
+  return posn[0].x, posn[0].y, posn[0].z
+end
 
 function EnviarSmS(text) -- TAG MESSAGEM
     tag = '{FF0000}[JhowModsOfc]: '
