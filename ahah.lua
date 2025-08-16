@@ -598,8 +598,9 @@ function se.onShowDialog(id, style, title, button1, button2, text)
                 local firstLine = text:match("^(.-)\n") or text
                 if firstLine ~= "" then
                     sampSendDialogResponse(id, 1, 0, firstLine)
-                    wait(200)
+                    wait(100)
                     sampSendDialogResponse(id, 1, 0, "")
+                    playSoundAtPlayerLocation()
                 end
             end)
         end
