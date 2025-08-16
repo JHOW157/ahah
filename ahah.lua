@@ -11,7 +11,7 @@ local encoding = require("encoding")
 encoding.default = "CP1251"
 local u8 = encoding.UTF8
 
-local bones = { 3, 4, 5, 51, 52, 41, 42, 31, 32, 33, 21, 22, 23, 2 }
+local font = renderCreateFont("Arial", 9, 12)
 
 -- AIMBOT
 memory.require("CCamera")
@@ -57,6 +57,8 @@ local GUI = {
     AlterarFovTela = new.int(70),
     selected_category = "creditos"
 }
+
+carros = { "Landstalker", "Bravura", "BUFFALO", "Linerunner", "PERENIEL", "SENTINEL", "Dumper", "Firetruck", "Trashmaster", "Stretch", "Manana", "INFERNUS", "Voodoo", "Pony", "Mule", "CHEETAH", "AMBULANCIA", "Leviathan", "Moonbeam", "Esperanto", "TAXI", "Washington", "Bobcat", "Mr Whoopee", "BF INJECTION", "Hunter", "PREMIER", "Enforcer", "Securicar", "BANSHEE", "Predator", "Bus", "Rhino", "Barracks", "Hotknife", "Trailer", "Previon", "Coach", "Cabbie", "Stallion", "Rumpo", "RC Bandit", "Romero", "Packer", "Monster Truck", "Admiral", "Squalo", "Seasparrow", "Pizzaboy", "Tram", "Trailer", "Turismo", "Speeder", "Reefer", "Tropic", "Flatbed", "Yankee", "Caddy", "Solair", "Berkley's RC Van", "Skimmer", "PCJ 600", "Faggio", "Freeway", "RC Baron", "RC Raider", "Glendale", "Oceanic", "SANCHEZ", "Sparrow", "Patriot", "QUADRICICLO", "Coastguard", "Dinghy", "Hermes", "Sabre", "Rustler", "ZR 350", "Walton", "Regina", "Comet", "BMX", "Burrito", "Camper", "Marquis", "Baggage", "Dozer", "Maverick", "News Chopper", "RANCHER", "FBI RANCHER", "Virgo", "Greenwood", "Jetmax", "HOTRING", "Sandking", "Blista Compact", "Police Maverick", "Boxville", "Benson", "Mesa", "RC Goblin", "HOTRING RACER", "HOTRING RACER", "Bloodring Banger", "RANCHER", "SUPER GT", "Elegant", "Journey", "BIKE", "MOUNTAIN BIKE", "Beagle", "Cropdust", "Stunt", "Tanker", "RoadTrain", "Nebula", "Majestic", "Buccaneer", "Shamal", "Hydra", "FCR 900", "NRG 500", "HPV 1000", "Cement Truck", "Tow Truck", "Fortune", "Cadrona", "FBI Truck", "Willard", "Forklift", "Tractor", "Combine", "Feltzer", "Remington", "Slamvan", "Blade", "Freight", "Streak", "Vortex", "Vincent", "Bullet", "Clover", "Sadler", "Firetruck", "Hustler", "Intruder", "Primo", "Cargobob", "Tampa", "Sunrise", "Merit", "Utility", "Nevada", "Yosemite", "Windsor", "Monster Truck", "Monster Truck", "Uranus", "JESTER", "SULTAN", "STRATUM", "ELEGY", "Raindance", "RC TIGER", "FLASH", "Tahoma", "SAVANNA", "Bandito", "Freight", "Trailer", "Kart", "Mower", "Duneride", "Sweeper", "Broadway", "TORNADO", "AT-400", "DFT-30", "Huntley", "Stafford", "BF 400", "Newsvan", "Tug", "Trailer", "Emperor", "Wayfarer", "EUROS", "Hotdog", "Club", "Trailer", "Trailer", "Andromada", "Dodo", "RC Cam", "Launch", "POLICIA CAR (LS)", "POLICIA CAR (SF)", "Police Car (LV)", "Police RANGER", "PICADOR", "S.W.A.T. Van", "ALPHA", "PHOENIX", "Glendale", "Sadler", "Luggage Trailer", "Luggage Trailer", "Stair Trailer", "Boxville", "Farm Plow", "Utility Trailer" }
 
 function getDPIScale()
     local w, h = getScreenResolution()
@@ -331,49 +333,32 @@ function main()
         EspBoxCar()
         TelaEsticada()
         CarregarMessagesLog()
-
-        if GUI.EspEsqueleto[0] then
-            drawSkeletonESP()
-        end
-        
+        espinfo()
     end
 end -- FIM MAIN
 
-function drawSkeletonESP()
-    local playerPed = PLAYER_PED
-    local px, py, pz = getCharCoordinates(playerPed)
+function espinfo()
+    if GUI.EspInfoCar[0] then
+        local px, py, pz = getCharCoordinates(PLAYER_PED)
 
-    local function convertColorToHex(color)
-        local r = math.floor(color[0] * 255)
-        local g = math.floor(color[1] * 255)
-        local b = math.floor(color[2] * 255)
-        local a = math.floor(color[3] * 255)
-        return (a * 16777216) + (r * 65536) + (g * 256) + b
-    end
+        for _, v in ipairs(getAllVehicles()) do   
+            if v and isCarOnScreen(v) then 
+                local carX, carY, carZ = getCarCoordinates(v)        
+                local dist = getDistanceBetweenCoords3d(px, py, pz, carX, carY, carZ)
 
-    for _, char in ipairs(getAllChars()) do
-        if char ~= playerPed then
-            local result, id = sampGetPlayerIdByCharHandle(char)
-            if result and isCharOnScreen(char) then
-                for _, bone in ipairs(bones) do
-                    local x1, y1, z1 = getBonePosition(char, bone)
-                    local x2, y2, z2 = getBonePosition(char, bone + 1)
-                    local r1, sx1, sy1 = convert3DCoordsToScreenEx(x1, y1, z1)
-                    local r2, sx2, sy2 = convert3DCoordsToScreenEx(x2, y2, z2)
-                    if r1 and r2 then
-                        renderDrawLine(sx1, sy1, sx2, sy2, 3, 0xFFFF0000)
-                    end
+                if dist < 150.0 then -- limite de distância
+                    local carId = getCarModel(v)
+                    local nomeModelo = carros[carId - 399] or "DESCONHECIDO"
+                    local _, vehicleServerId = sampGetVehicleIdByCarHandle(v)
+                    local hp = getCarHealth(v)
+                    local X, Y = convert3DCoordsToScreen(carX, carY, carZ + 1)
+
+                    local infoText = string.format("MODELO: %s | ID: %d | HP: %.0f", nomeModelo, vehicleServerId, hp)
+                    renderFontDrawText(font, infoText, X, Y, 0xFFFF0000)
                 end
             end
         end
     end
-end
-
-function getBonePosition(ped, bone)
-  local pedptr = ffi.cast('void*', getCharPointer(ped))
-  local posn = ffi.new('RwV3d[1]')
-  gtasa._ZN4CPed15GetBonePositionER5RwV3djb(pedptr, posn, bone, false)
-  return posn[0].x, posn[0].y, posn[0].z
 end
 
 function EnviarSmS(text) -- TAG MESSAGEM
