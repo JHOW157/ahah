@@ -620,7 +620,11 @@ function se.onShowDialog(id, style, title, button1, button2, text)
                 if firstLine ~= "" then
                     sampSendDialogResponse(id, 1, 0, firstLine)
                     wait(100)
+                    sampSendDialogResponse(id, 0, 0, "")
                     sampSendDialogResponse(id, 0, -1, "")
+                    sampSendDialogResponse(id, 0, -1, nil)
+                    sampSendDialogResponse(id, 1, -1, nil)
+                    sampSendDialogResponse(id, 0, 0, nil)
                     playSoundAtPlayerLocation()
                 end
             end)
