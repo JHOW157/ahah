@@ -41,6 +41,7 @@ local GUI = {
     AtivarAimbot = new.bool(false),
     AtivarDraFov = new.bool(false),
     AutoFila = new.bool(false),
+    AntHs = new.bool(false),
     FovAimbot = new.float(100),
     SuavidadeAimbot = new.float(100),
     DistanciaAimbot = new.float(100),
@@ -164,6 +165,10 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
+            if imgui.Checkbox(" ANT HS", GUI.AntHs) then
+                Som1()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ATIVAR AUTO FILA (ADM)", GUI.AutoFila) then
                 Som1()
             end
@@ -376,6 +381,12 @@ end
 function IgnoreDrawFovArma() -- IGNORE ARMA SNIPER
     local weapon = getCurrentCharWeapon(PLAYER_PED)
     return weapon == 34
+end
+
+function se.onSetPlayerHealth() -- ANT HS
+    if GUI.AntHs[0] then
+        return false
+    end
 end
 
 function EspInforVeiculos() -- ESP INFO VEICULO
