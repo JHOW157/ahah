@@ -11,8 +11,10 @@ local encoding = require("encoding")
 encoding.default = "CP1251"
 local u8 = encoding.UTF8
 
+-- RESOLUCAO DA TELA
+local screenWidth, screenHeight = getScreenResolution()
 -- FONTE ESP CARRO
-local EspFontCar = renderCreateFont("Arial", 12, 9)
+local EspFontCar = renderCreateFont("Arial", 16, 12)
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
@@ -37,6 +39,7 @@ end
 local GUI = {
     AbrirMenu = imgui.new.bool(false),
     AtivarAimbot = new.bool(false),
+    AtivarDraFov = new.bool(false),
     AutoFila = new.bool(false),
     FovAimbot = new.float(100),
     SuavidadeAimbot = new.float(100),
@@ -191,6 +194,10 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             if imgui.Checkbox(" ATIVAR AIMBOT", GUI.AtivarAimbot) then
                 Som1()
             end
+            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            if imgui.Checkbox(" ATIVAR DRAW FOV", GUI.AtivarDraFov) then
+                Som1()
+            end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             imgui.SliderFloat(" FOV AIMBOT", GUI.FovAimbot, 1, 100, "%.4f")
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
@@ -231,15 +238,15 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" ESP ESQUELETO", GUI.EspEsqueleto) then
+            if imgui.Checkbox(" ESP ESQUELETO (EM BREVE)", GUI.EspEsqueleto) then
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" ESP BOX", GUI.EspBox) then
+            if imgui.Checkbox(" ESP BOX (EM BREVE)", GUI.EspBox) then
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" ESP NOME", GUI.EspNome) then
+            if imgui.Checkbox(" ESP NOME (EM BREVE)", GUI.EspNome) then
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
@@ -335,8 +342,29 @@ function main()
         TelaEsticada()
         CarregarMessagesLog()
         EspInforVeiculos()
+        if GUI.AtivarDraFov[0] then
+            local centerX = screenWidth / 2
+            local centerY = screenHeight / 2
+            local radius = (GUI.FovAimbot[0] / 100) * 150
+            DrawCirculo(centerX, centerY, radius, 0xFFFFFFFF)
+        end
     end
 end -- FIM MAIN
+
+function DrawCirculo(x, y, radius, color)
+    local segments = 300 * DPI
+    local angleStep = (2 * math.pi) / segments
+    local lineWidth = 1.5 * DPI
+    for i = 0, segments - 0 do
+        local angle1 = i * angleStep
+        local angle2 = (i + 1) * angleStep
+        local x1 = x + (radius - lineWidth / 2) * math.cos(angle1)
+        local y1 = y + (radius - lineWidth / 2) * math.sin(angle1)
+        local x2 = x + (radius - lineWidth / 2) * math.cos(angle2)
+        local y2 = y + (radius - lineWidth / 2) * math.sin(angle2)
+        renderDrawLine(x1, y1, x2, y2, lineWidth, color)
+    end
+end
 
 function EspInforVeiculos() -- ESP INFO VEICULO
     if GUI.EspInfoCar[0] then
@@ -659,22 +687,11 @@ end
 
 function se.onPlayerQuit(playerId, LRas)
     local nick = sampGetPlayerNickname(playerId)
-    local LRasText = LOGSERVERMESS()
-    local MessagesLogString = string.format("{FFFFFF}%s[%d]{FF0004} %s{FFFFFF}", nick, playerId, LRasText)
+    local MessagesLogString = string.format("{FFFFFF}%s[%d]{FF0004} SAIU DO SERVER{FFFFFF}", nick, playerId)
     table.insert(MessagesLog, 1, MessagesLogString)
     if #MessagesLog > 6 then
         table.remove(MessagesLog, #MessagesLog)
     end
-end
-
-function LOGSERVERMESS()
-    local NomeLog = {
-        [0] = "SAIU DO SERVER",
-        [1] = "KICKADO",
-        [2] = "SEM NET",
-        [3] = "BANIDO"
-    }
-    return NomeLog[NomeLog] or "SAIU DO SERVER"
 end -- FIM LOG DO SERVER
 
 function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
