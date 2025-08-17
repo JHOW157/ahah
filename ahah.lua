@@ -109,6 +109,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
         imgui.PushStyleColor(imgui.Col.ButtonActive, imgui.ImVec4(0.6, 0.0, 0.0, 1.0))
         imgui.PushStyleColor(imgui.Col.Text, imgui.ImVec4(1.0, 1.0, 1.0, 1.0))
         if imgui.Button(faicons("XMARK"), imgui.ImVec2(buttonSize, buttonSize)) then
+            Som2()
             GUI.AbrirMenu[0] = false
         end
         imgui.PopStyleColor(4)
@@ -118,28 +119,28 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Image(Imagem, imgui.ImVec2(200 * DPI, 200 * DPI))
             if imgui.IsItemClicked() then
                 GUI.selected_category = "creditos"
-                playSoundAtPlayerLocation()
+                Som2()
             end
         end
         imgui.Dummy(imgui.ImVec2(0, 50 * DPI))
         if imgui.Button(     faicons("USER") .. " JOGADOR       ", categoria) then
             GUI.selected_category = "Jogador"
-            playSoundAtPlayerLocation()
+            Som2()
         end
         imgui.Dummy(imgui.ImVec2(0, 2 * DPI))
         if imgui.Button(     faicons("CROSSHAIRS") .. " COMBATE       ", categoria) then
             GUI.selected_category = "Aimbot"
-            playSoundAtPlayerLocation()
+            Som2()
         end
         imgui.Dummy(imgui.ImVec2(0, 2 * DPI))
         if imgui.Button(     faicons("EYE") .. " VISUAL          ", categoria) then
             GUI.selected_category = "visual"
-            playSoundAtPlayerLocation()
+            Som2()
         end
         imgui.Dummy(imgui.ImVec2(0, 80 * DPI))
         if imgui.Button(     faicons("GEAR") .. " CONFIG         ", categoria) then
             GUI.selected_category = "config"
-            playSoundAtPlayerLocation()
+            Som2()
         end
         imgui.Dummy(imgui.ImVec2(0, 2 * DPI))
 
@@ -161,11 +162,11 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" ATIVAR AUTO FILA (ADM)", GUI.AutoFila) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             if imgui.SliderInt(" AJUSTAR FOV", GUI.AlterarFovTela, 10, 120) then
@@ -188,7 +189,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" ATIVAR AIMBOT", GUI.AtivarAimbot) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             imgui.SliderFloat(" FOV AIMBOT", GUI.FovAimbot, 1, 100, "%.4f")
@@ -202,15 +203,15 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.SliderFloat(" LAGURA X", GUI.LaguraX, 0.39, 0.55, "%.4f")
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" IGNORE AFK", GUI.IgnoreAfkAim) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
             imgui.SameLine(320)
             if imgui.Checkbox(" IGNORE VEICULOS", GUI.IgnoreVeiculo) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" IGNORE OBJETOS", GUI.IgnoreObject) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
         end
         if GUI.selected_category == "visual" then
@@ -227,27 +228,27 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" ESP LINE", GUI.EspLine) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP ESQUELETO", GUI.EspEsqueleto) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP BOX", GUI.EspBox) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP NOME", GUI.EspNome) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP INFO VEICULO", GUI.EspInfoCar) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP CARRO", GUI.EspCarro) then
-                playSoundAtPlayerLocation()
+                Som1()
             end
         end
         if GUI.selected_category == "config" then
@@ -263,7 +264,9 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
-            imgui.Checkbox(" LOG SERVIDOR", GUI.AtivarMessagesLog)
+            if imgui.Checkbox(" LOG SERVIDOR", GUI.AtivarMessagesLog) then
+                Som1()
+            end
         end
         if GUI.selected_category == "creditos" then
             if Imagem2 then
@@ -320,13 +323,11 @@ function main()
     while not isSampAvailable() do
         wait(100)
     end
-    EnviarSmS("{00FF00}Menu Mobile carregado com sucesso! Use /hexdump", -1)
-
+    EnviarSmS("{00FF00}Menu Mobile carregado com sucesso!", -1)
     while true do
         if isWidgetSwipedLeft(WIDGET_RADAR) then
             GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
         end
-
         wait(0)
         Aimbot()
         EspLine()
@@ -625,7 +626,7 @@ function se.onShowDialog(id, style, title, button1, button2, text)
                     sampSendDialogResponse(id, 0, -1, nil)
                     sampSendDialogResponse(id, 1, -1, nil)
                     sampSendDialogResponse(id, 0, 0, nil)
-                    playSoundAtPlayerLocation()
+                    Som1()
                 end
             end)
             return false
@@ -684,11 +685,19 @@ function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
     return size
 end
 
-function playSoundAtPlayerLocation() -- SOM
-    local som = PLAYER_PED
-    if som then
-        local x, y, z = getCharCoordinates(som)
+function Som1()
+    local som1 = PLAYER_PED
+    if som1 then
+        local x, y, z = getCharCoordinates(som1)
         addOneOffSound(x, y, z, 1139)
+    end
+end
+
+function Som2()
+    local som2 = PLAYER_PED
+    if som2 then
+        local x, y, z = getCharCoordinates(som2)
+        addOneOffSound(x, y, z, 1085)
     end
 end
 
