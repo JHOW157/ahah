@@ -342,16 +342,18 @@ function main()
         TelaEsticada()
         CarregarMessagesLog()
         EspInforVeiculos()
-        if GUI.AtivarDraFov[0] then
-            local centerX = screenWidth / 2
-            local centerY = screenHeight / 2
+        
+        if GUI.AtivarDraFov[0] and GUI.AtivarAimbot[0] and isPlayerArmed() and not IgnoreDrawFovArma() then -- DRAW FOV AIMBOT
+            local centerX = (screenWidth / 2) + 40 * DPI
+            local centerY = (screenHeight / 2) - 60 * DPI
             local radius = (GUI.FovAimbot[0] / 100) * 150
             DrawCirculo(centerX, centerY, radius, 0xFFFFFFFF)
         end
+
     end
 end -- FIM MAIN
 
-function DrawCirculo(x, y, radius, color)
+function DrawCirculo(x, y, radius, color) -- DESENHO DO CIRCULO
     local segments = 300 * DPI
     local angleStep = (2 * math.pi) / segments
     local lineWidth = 1.5 * DPI
@@ -364,6 +366,16 @@ function DrawCirculo(x, y, radius, color)
         local y2 = y + (radius - lineWidth / 2) * math.sin(angle2)
         renderDrawLine(x1, y1, x2, y2, lineWidth, color)
     end
+end
+
+function isPlayerArmed() -- IGNORE SOCO ATE ARMA 16
+    local weapon = getCurrentCharWeapon(PLAYER_PED)
+    return weapon > 0 and weapon ~= 16
+end
+
+function IgnoreDrawFovArma() -- IGNORE ARMA SNIPER
+    local weapon = getCurrentCharWeapon(PLAYER_PED)
+    return weapon == 34
 end
 
 function EspInforVeiculos() -- ESP INFO VEICULO
