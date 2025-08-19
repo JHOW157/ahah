@@ -13,8 +13,9 @@ local u8 = encoding.UTF8
 
 -- RESOLUCAO DA TELA
 local screenWidth, screenHeight = getScreenResolution()
--- FONTE ESP CARRO
+-- FONTE
 local EspFontCar = renderCreateFont("Arial", 16, 12)
+local EspSkin = renderCreateFont("Arial", 9, 4)
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
@@ -43,16 +44,18 @@ local GUI = {
     AutoFila = new.bool(false),
     AntHs = new.bool(false),
     FovAimbot = new.float(100),
-    SuavidadeAimbot = new.float(100),
+    SuavidadeAimbot = new.int(100),
     DistanciaAimbot = new.float(100),
     AlturaY = new.float(0.4381),
     LaguraX = new.float(0.5211),
     IgnoreAfkAim = new.bool(false),
     IgnoreVeiculo = new.bool(false),
     IgnoreObject = new.bool(false),
+    IgnoreAmigos = new.bool(false),
     EspLine = new.bool(false),
     EspBox = new.bool(false),
     EspEsqueleto = new.bool(false),
+    EspSkinId = new.bool(false),
     EspNome = new.bool(false),
     EspInfoCar = new.bool(false),
     EspCarro = new.bool(false),
@@ -173,10 +176,10 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
+            if Toggle(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
                 Som1()
             end
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
             if imgui.SliderInt(" AJUSTAR FOV", GUI.AlterarFovTela, 10, 120) then
                 if GUI.AtivarTelaEsticada[0] then
                     cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
@@ -196,17 +199,17 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
-            if imgui.Checkbox(" ATIVAR AIMBOT", GUI.AtivarAimbot) then
+            if Toggle(" ATIVAR AIMBOT", GUI.AtivarAimbot) then
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            if imgui.Checkbox(" ATIVAR DRAW FOV", GUI.AtivarDraFov) then
+            if Toggle(" ATIVAR DRAW FOV", GUI.AtivarDraFov) then
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             imgui.SliderFloat(" FOV AIMBOT", GUI.FovAimbot, 1, 100, "%.4f")
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            imgui.SliderFloat(" SUAVIDADE", GUI.SuavidadeAimbot, 1, 100, "%.4f")
+            imgui.SliderInt(" SUAVIDADE", GUI.SuavidadeAimbot, 1, 100)
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             imgui.SliderFloat(" DISTANCIA", GUI.DistanciaAimbot, 1, 100, "%.4f")
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
@@ -225,6 +228,10 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             if imgui.Checkbox(" IGNORE OBJETOS", GUI.IgnoreObject) then
                 Som1()
             end
+            imgui.SameLine(320)
+            if imgui.Checkbox(" IGNORE AMIGOS (EM BREVE)", GUI.IgnoreAmigos) then
+                Som1()
+            end
         end
         if GUI.selected_category == "visual" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
@@ -240,6 +247,10 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" ESP LINE", GUI.EspLine) then
+                Som1()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+            if imgui.Checkbox(" ESP SKIN ID", GUI.EspSkinId) then
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
@@ -353,6 +364,16 @@ function main()
             local centerY = (screenHeight / 2) - 60 * DPI
             local radius = (GUI.FovAimbot[0] / 100) * 150
             DrawCirculo(centerX, centerY, radius, 0xFFFFFFFF)
+        end
+
+        if GUI.EspSkinId[0] then
+            for _, ped in ipairs(getAllChars()) do
+                if ped ~= playerPed and doesCharExist(ped) and isCharOnScreen(ped) then
+                    local cx, cy, cz = getCharCoordinates(ped)
+                    local x, y = convert3DCoordsToScreen(cx, cy, cz)
+                    renderFontDrawText(EspSkin, string.format("ID DA SKIN: %d", getCharModel(ped)), x, y, 0xFF00FF00)
+                end
+            end
         end
 
     end
@@ -513,31 +534,44 @@ function Aimbot()
         local distanciaMaxima = math.floor((GUI.DistanciaAimbot[0] - 1) * (120 - 0) / (100 - 1))
         local modoCamera = camera_principal.aCams[0].nMode
         local suavidadeMaxia = math.floor(100 + (GUI.SuavidadeAimbot[0] - 1) * (250 - 100) / (100 - 1))
-        local charProximo = obterCharProximoAoCentro(suavidadeMaxia)
-
-        if charProximo then
-            local result, playerId = sampGetPlayerIdByCharHandle(charProximo)
-            
-            if result and not isTargetAfkAim(playerId) and not isPlayerInVehicleAim(charProximo) then
-                local posicaoX, posicaoY, posicaoZ = obterPosicaoDoOsso(charProximo, 5)
-                local coordX, coordY, coordZ = getCharCoordinates(PLAYER_PED)
-                local distanciaTotal = getDistanceBetweenCoords3d(coordX, coordY, coordZ, posicaoX, posicaoY, posicaoZ)
-
-                if distanciaTotal < distanciaMaxima then
-                    local charAlvo = charProximo
-                    local alvoX, alvoY, alvoZ = obterPosicaoDoOsso(charAlvo, 5)
-
-                    local myPos = {coordX, coordY, coordZ}
-                    local enPos = {alvoX, alvoY, alvoZ}
-                    if isClearObject(myPos, enPos) then
-                        ponto = vector3d(alvoX, alvoY, alvoZ)
-
-                        if modoCamera == 7 then
-                            mirarPontoComMiraTelescopica(ponto)
-                        elseif modoCamera == 53 then
-                            mirarPontoComM16(ponto)
+        local largura, altura = getScreenResolution()
+        local centroX, centroY = largura / 2, altura / 2
+        local maxFovRadius = (GUI.FovAimbot[0] / 100) * 150
+        local charProximo = nil
+        local menorDistFov = nil
+        for _, char in ipairs(getAllChars()) do
+            if isCharOnScreen(char) and char ~= PLAYER_PED and not isCharDead(char) then
+                local result, playerId = sampGetPlayerIdByCharHandle(char)
+                if result and not isTargetAfkAim(playerId) and not isPlayerInVehicleAim(char) then
+                    local posicaoX, posicaoY, posicaoZ = obterPosicaoDoOsso(char, 5)
+                    local coordX, coordY, coordZ = getCharCoordinates(PLAYER_PED)
+                    local distanciaTotal = getDistanceBetweenCoords3d(coordX, coordY, coordZ, posicaoX, posicaoY, posicaoZ)
+                    if distanciaTotal < distanciaMaxima then
+                        local sx, sy = convert3DCoordsToScreen(posicaoX, posicaoY, posicaoZ)
+                        if sx and sy then
+                            local distFov = math.sqrt((sx - centroX)^2 + (sy - centroY)^2)
+                            if distFov <= maxFovRadius then
+                                if not menorDistFov or distFov < menorDistFov then
+                                    menorDistFov = distFov
+                                    charProximo = char
+                                end
+                            end
                         end
                     end
+                end
+            end
+        end
+        if charProximo then
+            local alvoX, alvoY, alvoZ = obterPosicaoDoOsso(charProximo, 5)
+            local coordX, coordY, coordZ = getCharCoordinates(PLAYER_PED)
+            local myPos = {coordX, coordY, coordZ}
+            local enPos = {alvoX, alvoY, alvoZ}
+            if isClearObject(myPos, enPos) then
+                ponto = vector3d(alvoX, alvoY, alvoZ)
+                if modoCamera == 7 then
+                    mirarPontoComMiraTelescopica(ponto)
+                elseif modoCamera == 53 then
+                    mirarPontoComM16(ponto)
                 end
             end
         end
@@ -739,6 +773,60 @@ function Som2()
         local x, y, z = getCharCoordinates(som2)
         addOneOffSound(x, y, z, 1085)
     end
+end
+
+function Toggle(id, bool)
+    local rBool = false
+
+    if UltimoTempoAtivo == nil then
+        UltimoTempoAtivo = {}
+    end
+    if UltimoAtivo == nil then
+        UltimoAtivo = {}
+    end
+
+    local function ImSaturate(f)
+        return f < 0.0 and 0.0 or (f > 1.0 and 1.0 or f)
+    end
+
+    local p = imgui.GetCursorScreenPos()
+    local dl = imgui.GetWindowDrawList()
+    local altura = imgui.GetTextLineHeightWithSpacing()
+    local largura = altura * 2.21
+    local raio = altura * 0.50
+    local VELOCIDADE_ANIMACAO = type == 2 and 0.10 or 0.15
+    local butPos = imgui.GetCursorPos()
+
+    if imgui.InvisibleButton(id, imgui.ImVec2(largura, altura)) then
+        bool[0] = not bool[0]
+        rBool = true
+        UltimoTempoAtivo[tostring(id)] = os.clock()
+        UltimoAtivo[tostring(id)] = true
+    end
+
+    imgui.SetCursorPos(imgui.ImVec2(butPos.x + largura + 8, butPos.y + 2.5))
+    imgui.Text(id:gsub('##.+', ''))
+
+    local t = bool[0] and 1.0 or 0.0
+
+    if UltimoAtivo[tostring(id)] then
+        local time = os.clock() - UltimoTempoAtivo[tostring(id)]
+        if time <= VELOCIDADE_ANIMACAO then
+            local t_anim = ImSaturate(time / VELOCIDADE_ANIMACAO)
+            t = bool[0] and t_anim or 1.0 - t_anim
+        else
+            UltimoAtivo[tostring(id)] = false
+        end
+    end
+
+    local col_bg = bool[0] and imgui.ColorConvertFloat4ToU32(imgui.ImVec4(1.0, 0.0, 0.0, 1.0)) or imgui.ColorConvertFloat4ToU32(imgui.ImVec4(1.0, 0.0, 0.0, 1.0))
+    local col_circle = bool[0] and imgui.ColorConvertFloat4ToU32(imgui.ImVec4(0.0, 1.0, 0.0, 1.0)) or imgui.ColorConvertFloat4ToU32(imgui.ImVec4(1.0, 1.0, 1.0, 1.0))
+
+    dl:AddRectFilled(p, imgui.ImVec2(p.x + largura, p.y + altura), col_bg, altura * 0.5)
+    dl:AddCircleFilled(imgui.ImVec2(p.x + raio + t * (largura - raio * 2.0), p.y + raio), raio - 1.5, col_circle, 30)
+    imgui.SetCursorPos(imgui.ImVec2(butPos.x, butPos.y + altura + 5))
+
+    return rBool
 end
 
 function TemaVermelho()
