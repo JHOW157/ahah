@@ -48,6 +48,8 @@ local GUI = {
     DistanciaAimbot = new.float(100),
     AlturaY = new.float(0.4381),
     LaguraX = new.float(0.5211),
+    Cabeca = new.bool(false),
+    Peito = new.bool(false),
     IgnoreAfkAim = new.bool(false),
     IgnoreVeiculo = new.bool(false),
     IgnoreObject = new.bool(false),
@@ -168,22 +170,22 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
+            if Toggle(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
+                Som1()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
+            if Slider("AJUSTAR FOV", GUI.AlterarFovTela, 10, 120, 400) then
+                if GUI.AtivarTelaEsticada[0] then
+                    cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
+                end
+            end
+            imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" ANT HS", GUI.AntHs) then
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ATIVAR AUTO FILA (ADM)", GUI.AutoFila) then
                 Som1()
-            end
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if Toggle(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
-                Som1()
-            end
-            imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
-            if imgui.SliderInt(" AJUSTAR FOV", GUI.AlterarFovTela, 10, 120) then
-                if GUI.AtivarTelaEsticada[0] then
-                    cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
-                end
             end
         end
         if GUI.selected_category == "Aimbot" then
@@ -207,15 +209,29 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            imgui.SliderFloat(" FOV AIMBOT", GUI.FovAimbot, 1, 100, "%.4f")
+            Slider("FOV AIMBOT", GUI.FovAimbot, 1, 100, 400)
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            imgui.SliderInt(" SUAVIDADE", GUI.SuavidadeAimbot, 1, 100)
+            Slider("SUAVIDADE", GUI.SuavidadeAimbot, 1, 100, 400)
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            imgui.SliderFloat(" DISTANCIA", GUI.DistanciaAimbot, 1, 100, "%.4f")
+            Slider("DISTANCIA", GUI.DistanciaAimbot, 1, 100, 400, "%.4f")
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            imgui.SliderFloat(" ALTURA Y", GUI.AlturaY, 0.39, 0.55, "%.4f")
+            Slider("ALTURA Y", GUI.AlturaY, 0.39, 0.55, 400, "%.4f")
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            imgui.SliderFloat(" LAGURA X", GUI.LaguraX, 0.39, 0.55, "%.4f")
+            Slider("LAGURA X", GUI.LaguraX, 0.39, 0.55, 400, "%.4f")
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+            if imgui.Checkbox(" CABECA", GUI.Cabeca) then
+                Som1()
+                GUI.Peito[0] = false
+                GUI.AlturaY[0] = 0.4381
+                GUI.LaguraX[0] = 0.5211
+            end
+            imgui.SameLine(320)
+            if imgui.Checkbox(" PEITO", GUI.Peito) then
+                Som1()
+                GUI.Cabeca[0] = false
+                GUI.AlturaY[0] = 0.4111
+                GUI.LaguraX[0] = 0.5199
+            end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" IGNORE AFK", GUI.IgnoreAfkAim) then
                 Som1()
@@ -346,7 +362,7 @@ function main()
     while not isSampAvailable() do
         wait(100)
     end
-    EnviarSmS("{00FF00}Menu Mobile carregado com sucesso!", -1)
+    EnviarSmS("{00FF00}Hex Dump Mobile carregado com sucesso!", -1)
     while true do
         if isWidgetSwipedLeft(WIDGET_RADAR) then
             GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
@@ -413,9 +429,9 @@ end
 function EspInforVeiculos() -- ESP INFO VEICULO
     if GUI.EspInfoCar[0] then
         local px, py, pz = getCharCoordinates(PLAYER_PED)
-        for _, v in ipairs(getAllVehicles()) do   
-            if v and isCarOnScreen(v) then 
-                local carX, carY, carZ = getCarCoordinates(v)        
+        for _, v in ipairs(getAllVehicles()) do
+            if v and isCarOnScreen(v) then
+                local carX, carY, carZ = getCarCoordinates(v)
                 local dist = getDistanceBetweenCoords3d(px, py, pz, carX, carY, carZ)
                 if dist < 150.0 then
                     local carId = getCarModel(v)
@@ -519,7 +535,6 @@ function obterCharProximoAoCentro(distanciaMaxima)
             end
         end
     end
-
     if #charsProximos > 0 then
         table.sort(charsProximos, function(a, b)
             return a[1] < b[1]
@@ -759,7 +774,7 @@ function CarregarFoto(path) -- CARREGAR AS FOTOS E OUTROS ARQUIVOS
     return size
 end
 
-function Som1()
+function Som1() -- SOM 1
     local som1 = PLAYER_PED
     if som1 then
         local x, y, z = getCharCoordinates(som1)
@@ -767,7 +782,7 @@ function Som1()
     end
 end
 
-function Som2()
+function Som2() -- SOM 2
     local som2 = PLAYER_PED
     if som2 then
         local x, y, z = getCharCoordinates(som2)
@@ -775,7 +790,7 @@ function Som2()
     end
 end
 
-function Toggle(id, bool)
+function Toggle(id, bool) -- BOTAO TOGGLE
     local rBool = false
 
     if UltimoTempoAtivo == nil then
@@ -827,7 +842,74 @@ function Toggle(id, bool)
     imgui.SetCursorPos(imgui.ImVec2(butPos.x, butPos.y + altura + 5))
 
     return rBool
-end
+end -- FIM BOTAO TOGGLE
+
+function Slider(id, value, min, max, width, format) -- BOTAO SLIDE
+    local rChanged = false
+    local DPI = imgui.GetIO().FontGlobalScale
+    local p = imgui.GetCursorScreenPos()
+    local dl = imgui.GetWindowDrawList()
+    local altura = imgui.GetTextLineHeightWithSpacing() * 0.8 * DPI
+    local largura = (width or 250) * DPI
+    local raio = altura * 0.8
+    format = format or "%.0f%%"
+    
+    local t = (value[0] - min) / (max - min)
+    t = t < 0 and 0 or (t > 1 and 1 or t)
+    local porcentagem = t * 100
+    
+    imgui.SetCursorScreenPos(imgui.ImVec2(p.x, p.y))
+    imgui.Text(id:gsub('##.+', ''))
+    
+    local textWidthEstimate = imgui.GetFontSize() * 6 * DPI
+    imgui.SetCursorScreenPos(imgui.ImVec2(p.x + textWidthEstimate, p.y))
+    
+    local sliderStart = imgui.ImVec2(p.x + textWidthEstimate, p.y)
+
+    if imgui.InvisibleButton(id, imgui.ImVec2(largura, altura)) then
+        local mousePos = imgui.GetMousePos()
+        local relativeX = mousePos.x - sliderStart.x
+        local newT = relativeX / largura
+        newT = newT < 0 and 0 or (newT > 1 and 1 or newT)
+        value[0] = min + newT * (max - min)
+        rChanged = true
+    end
+    
+    if imgui.IsItemActive() and imgui.IsMouseDragging(0) then
+        local mousePos = imgui.GetMousePos()
+        local relativeX = mousePos.x - sliderStart.x
+        local newT = relativeX / largura
+        newT = newT < 0 and 0 or (newT > 1 and 1 or newT)
+        value[0] = min + newT * (max - min)
+        rChanged = true
+    end
+    
+    imgui.SetCursorScreenPos(imgui.ImVec2(sliderStart.x + largura + 30 * DPI, p.y))
+    
+    local displayText
+    if format == "%.0f%%" then
+        displayText = string.format(format, porcentagem)
+    else
+        displayText = string.format(format, value[0])
+    end
+    imgui.Text(displayText)
+    
+    local col_bg = imgui.ColorConvertFloat4ToU32(imgui.ImVec4(0.3, 0.3, 0.3, 1.0))
+    local col_fill = imgui.ColorConvertFloat4ToU32(imgui.ImVec4(1.0, 0.0, 0.0, 1.0))
+    local col_handle = imgui.ColorConvertFloat4ToU32(imgui.ImVec4(1.0, 1.0, 1.0, 1.0))
+    
+    dl:AddRectFilled(sliderStart, imgui.ImVec2(sliderStart.x + largura, sliderStart.y + altura), col_bg, altura * 0.5)
+    dl:AddRectFilled(sliderStart, imgui.ImVec2(sliderStart.x + largura * t, sliderStart.y + altura), col_fill, altura * 0.5)
+    
+    local handlePosX = sliderStart.x + largura * t
+    dl:AddCircleFilled(imgui.ImVec2(handlePosX, sliderStart.y + altura / 2), raio, col_handle, 30)
+    
+    dl:AddRect(sliderStart, imgui.ImVec2(sliderStart.x + largura, sliderStart.y + altura), imgui.ColorConvertFloat4ToU32(imgui.ImVec4(1.0, 1.0, 1.0, 0.5)), altura * 0.5)
+    
+    imgui.SetCursorScreenPos(imgui.ImVec2(p.x, p.y + altura + 8 * DPI))
+    
+    return rChanged
+end -- FIM BOTAO SLIDE
 
 function TemaVermelho()
     local style = imgui.GetStyle()
