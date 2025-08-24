@@ -225,7 +225,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 GUI.AlturaY[0] = 0.4381
                 GUI.LaguraX[0] = 0.5211
             end
-            imgui.SameLine(320)
+            imgui.SameLine(400)
             if imgui.Checkbox(" PEITO", GUI.Peito) then
                 Som1()
                 GUI.Cabeca[0] = false
@@ -236,7 +236,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             if imgui.Checkbox(" IGNORE AFK", GUI.IgnoreAfkAim) then
                 Som1()
             end
-            imgui.SameLine(320)
+            imgui.SameLine(400)
             if imgui.Checkbox(" IGNORE VEICULOS", GUI.IgnoreVeiculo) then
                 Som1()
             end
@@ -244,7 +244,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             if imgui.Checkbox(" IGNORE OBJETOS", GUI.IgnoreObject) then
                 Som1()
             end
-            imgui.SameLine(320)
+            imgui.SameLine(400)
             if imgui.Checkbox(" IGNORE AMIGOS (EM BREVE)", GUI.IgnoreAmigos) then
                 Som1()
             end
@@ -364,16 +364,23 @@ function main()
     end
     EnviarSmS("{00FF00}Hex Dump Mobile carregado com sucesso!", -1)
     while true do
+        wait(0)
+        
         if isWidgetSwipedLeft(WIDGET_RADAR) then
             GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
         end
-        wait(0)
-        Aimbot()
-        EspLine()
-        EspBoxCar()
-        TelaEsticada()
-        CarregarMessagesLog()
-        EspInforVeiculos()
+
+        if GUI.AbrirMenu[0] then
+            Aimbot()
+            TelaEsticada()
+        else
+            Aimbot()
+            EspLine()
+            EspBoxCar()
+            TelaEsticada()
+            CarregarMessagesLog()
+            EspInforVeiculos()
+        end
         
         if GUI.AtivarDraFov[0] and GUI.AtivarAimbot[0] and isPlayerArmed() and not IgnoreDrawFovArma() then -- DRAW FOV AIMBOT
             local centerX = (screenWidth / 2) + 40 * DPI
@@ -395,18 +402,16 @@ function main()
     end
 end -- FIM MAIN
 
-function DrawCirculo(x, y, radius, color) -- DESENHO DO CIRCULO
-    local segments = 300 * DPI
-    local angleStep = (2 * math.pi) / segments
-    local lineWidth = 1.5 * DPI
-    for i = 0, segments - 0 do
-        local angle1 = i * angleStep
-        local angle2 = (i + 1) * angleStep
-        local x1 = x + (radius - lineWidth / 2) * math.cos(angle1)
-        local y1 = y + (radius - lineWidth / 2) * math.sin(angle1)
-        local x2 = x + (radius - lineWidth / 2) * math.cos(angle2)
-        local y2 = y + (radius - lineWidth / 2) * math.sin(angle2)
-        renderDrawLine(x1, y1, x2, y2, lineWidth, color)
+function DrawCirculo(x, y, radius, color)
+    local segmentos = math.min(128, math.max(64, math.floor(128 * DPI)))
+    local step = (2 * math.pi) / segmentos
+    local oldX, oldY = x + radius, y
+
+    for i = 1, segmentos do
+        local newX = x + radius * math.cos(step * i)
+        local newY = y + radius * math.sin(step * i)
+        renderDrawLine(oldX, oldY, newX, newY, 1, color)
+        oldX, oldY = newX, newY
     end
 end
 
@@ -631,6 +636,7 @@ end
 function EspLine() -- ESP LINE
     if GUI.EspLine[0] then
         local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
+        local thin = math.max(1.0, 1.25 * DPI)
         for playerId = 0, sampGetMaxPlayerId(false) do
             if sampIsPlayerConnected(playerId) then
                 local result, playerPed = sampGetCharHandleBySampPlayerId(playerId)
@@ -642,7 +648,7 @@ function EspLine() -- ESP LINE
                         local screenWidth, screenHeight = getScreenResolution()
                         local lineStartX = screenWidth / 2
                         local lineStartY = 0
-                        renderDrawLine(lineStartX, lineStartY, lineEndX, lineEndY, 2, 0xFFFF0000)
+                        renderDrawLine(lineStartX, lineStartY, lineEndX, lineEndY, thin, 0xFFFF0000)
                     end
                 end
             end
@@ -654,6 +660,8 @@ function EspBoxCar() -- ESP CAR BOX
     if GUI.EspCarro[0] then
         local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
         local x, y = convert3DCoordsToScreen(playerX, playerY, playerZ)
+        local thin = math.max(1.0, 1.25 * DPI)
+
         for _, vehicle in ipairs(getAllVehicles()) do
             if isCarOnScreen(vehicle) then
                 local carX, carY, carZ = getCarCoordinates(vehicle)
@@ -679,15 +687,15 @@ function EspBoxCar() -- ESP CAR BOX
 
                 for i = 1, 4 do
                     local nextIndex = (i % 4 == 0 and i - 3) or (i + 1)
-                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, 2, 0xFFFFFFFF)
-                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[i + 4].x, boxCorners[i + 4].y, 2, 0xFFFFFFFF)
+                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, thin, 0xFFFFFFFF)
+                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[i + 4].x, boxCorners[i + 4].y, thin, 0xFFFFFFFF)
                 end
 
                 for i = 5, 8 do
                     local nextIndex = (i % 4 == 0 and i - 3) or (i + 1)
-                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, 2, 0xFFFFFFFF)
+                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, thin, 0xFFFFFFFF)
                 end
-                renderDrawLine(x, y, px, py, 2, 0xFFFFFFFF)
+                renderDrawLine(x, y, px, py, thin, 0xFFFFFFFF)
             end
         end
     end
