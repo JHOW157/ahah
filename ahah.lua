@@ -363,6 +363,9 @@ function main()
         wait(100)
     end
     EnviarSmS("{00FF00}Hex Dump Mobile carregado com sucesso!", -1)
+    sampRegisterChatCommand("hexdump", function()
+        GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
+    end)
     while true do
         wait(0)
         
