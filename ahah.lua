@@ -41,7 +41,6 @@ local GUI = {
     AbrirMenu = imgui.new.bool(false),
     AtivarAimbot = new.bool(false),
     AtivarDraFov = new.bool(false),
-    AutoFila = new.bool(false),
     AntHs = new.bool(false),
     FovAimbot = new.float(100),
     SuavidadeAimbot = new.int(100),
@@ -183,10 +182,6 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             if imgui.Checkbox(" ANT HS", GUI.AntHs) then
                 Som1()
             end
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" ATIVAR AUTO FILA (ADM)", GUI.AutoFila) then
-                Som1()
-            end
         end
         if GUI.selected_category == "Aimbot" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
@@ -213,7 +208,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             Slider("SUAVIDADE", GUI.SuavidadeAimbot, 1, 100, 400)
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            Slider("DISTANCIA", GUI.DistanciaAimbot, 1, 100, 400, "%.4f")
+            Slider("DISTANCIA", GUI.DistanciaAimbot, 1, 100, 400)
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             Slider("ALTURA Y", GUI.AlturaY, 0.39, 0.55, 400, "%.4f")
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
@@ -389,7 +384,40 @@ function main()
             local centerX = (screenWidth / 2) + 40 * DPI
             local centerY = (screenHeight / 2) - 60 * DPI
             local radius = (GUI.FovAimbot[0] / 100) * 150
-            DrawCirculo(centerX, centerY, radius, 0xFFFFFFFF)
+            
+            local distanciaMaxima = math.floor((GUI.DistanciaAimbot[0] - 1) * (200 - 10) / (100 - 1)) + 10
+            
+            local temAlvoNoFov = false
+            local coordX, coordY, coordZ = getCharCoordinates(PLAYER_PED)
+            
+            for _, char in ipairs(getAllChars()) do
+                if isCharOnScreen(char) and char ~= PLAYER_PED and not isCharDead(char) then
+                    local result, playerId = sampGetPlayerIdByCharHandle(char)
+                    if result and not isTargetAfkAim(playerId) and not isPlayerInVehicleAim(char) then
+                        local posicaoX, posicaoY, posicaoZ = obterPosicaoDoOsso(char, 5)
+                        local distanciaTotal = getDistanceBetweenCoords3d(coordX, coordY, coordZ, posicaoX, posicaoY, posicaoZ)
+                        if distanciaTotal < distanciaMaxima then
+                            local sx, sy = convert3DCoordsToScreen(posicaoX, posicaoY, posicaoZ)
+                            if sx and sy then
+                                local distFov = math.sqrt((sx - centerX)^2 + (sy - centerY)^2)
+                                if distFov <= radius then
+                                    temAlvoNoFov = true
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+                if temAlvoNoFov then break end
+            end
+            
+            local corFov
+            if temAlvoNoFov then
+                corFov = 0xFF00FF00
+            else
+                corFov = 0xFFFF0000
+            end
+            DrawCirculo(centerX, centerY, radius, corFov)
         end
 
         if GUI.EspSkinId[0] then
@@ -553,8 +581,8 @@ function obterCharProximoAoCentro(distanciaMaxima)
 end
 
 function Aimbot()
-    if GUI.AtivarAimbot[0] then
-        local distanciaMaxima = math.floor((GUI.DistanciaAimbot[0] - 1) * (120 - 0) / (100 - 1))
+    if GUI.AtivarAimbot[0] and isPlayerArmed() then
+        local distanciaMaxima = math.floor((GUI.DistanciaAimbot[0] - 1) * (200 - 10) / (100 - 1)) + 10
         local modoCamera = camera_principal.aCams[0].nMode
         local suavidadeMaxia = math.floor(100 + (GUI.SuavidadeAimbot[0] - 1) * (250 - 100) / (100 - 1))
         local largura, altura = getScreenResolution()
@@ -562,18 +590,21 @@ function Aimbot()
         local maxFovRadius = (GUI.FovAimbot[0] / 100) * 150
         local charProximo = nil
         local menorDistFov = nil
+        
+        local coordX, coordY, coordZ = getCharCoordinates(PLAYER_PED)
+        local myPos = {coordX, coordY, coordZ}
+        
         for _, char in ipairs(getAllChars()) do
             if isCharOnScreen(char) and char ~= PLAYER_PED and not isCharDead(char) then
                 local result, playerId = sampGetPlayerIdByCharHandle(char)
                 if result and not isTargetAfkAim(playerId) and not isPlayerInVehicleAim(char) then
                     local posicaoX, posicaoY, posicaoZ = obterPosicaoDoOsso(char, 5)
-                    local coordX, coordY, coordZ = getCharCoordinates(PLAYER_PED)
                     local distanciaTotal = getDistanceBetweenCoords3d(coordX, coordY, coordZ, posicaoX, posicaoY, posicaoZ)
                     if distanciaTotal < distanciaMaxima then
                         local sx, sy = convert3DCoordsToScreen(posicaoX, posicaoY, posicaoZ)
                         if sx and sy then
                             local distFov = math.sqrt((sx - centroX)^2 + (sy - centroY)^2)
-                            if distFov <= maxFovRadius then
+                            if distFov <= maxFovRadius * 2.0 then
                                 if not menorDistFov or distFov < menorDistFov then
                                     menorDistFov = distFov
                                     charProximo = char
@@ -584,17 +615,42 @@ function Aimbot()
                 end
             end
         end
+        
         if charProximo then
             local alvoX, alvoY, alvoZ = obterPosicaoDoOsso(charProximo, 5)
             local coordX, coordY, coordZ = getCharCoordinates(PLAYER_PED)
             local myPos = {coordX, coordY, coordZ}
             local enPos = {alvoX, alvoY, alvoZ}
-            if isClearObject(myPos, enPos) then
+            
+            local temVisao = true
+            if GUI.IgnoreObject[0] then
+                temVisao = isLineOfSightClear(myPos[1], myPos[2], myPos[3], enPos[1], enPos[2], enPos[3], true, false, false, true, false, false, false)
+            end
+            
+            if temVisao then
                 ponto = vector3d(alvoX, alvoY, alvoZ)
                 if modoCamera == 7 then
                     mirarPontoComMiraTelescopica(ponto)
                 elseif modoCamera == 53 then
-                    mirarPontoComM16(ponto)
+                    local fatorSuavidade = math.max(0.8, GUI.SuavidadeAimbot[0] / 100)
+                    local anguloHorizontal, anguloVertical = converterCoordenadasCartesianasParaEsfericas(ponto)
+                    local rotacaoHorizontal, rotacaoVertical = obterRotacaoDaCamera()
+                    local miraHorizontal, miraVertical = obterRotacaoDoMira()
+                    
+                    local novaRotacaoHorizontal = rotacaoHorizontal + (anguloHorizontal - miraHorizontal) * fatorSuavidade
+                    local novaRotacaoVertical = rotacaoVertical + (anguloVertical - miraVertical) * fatorSuavidade
+                    
+                    definirRotacaoDaCamera(novaRotacaoHorizontal, novaRotacaoVertical)
+                else
+                    local fatorSuavidade = math.max(0.8, GUI.SuavidadeAimbot[0] / 100)
+                    local anguloHorizontal, anguloVertical = converterCoordenadasCartesianasParaEsfericas(ponto)
+                    local rotacaoHorizontal, rotacaoVertical = obterRotacaoDaCamera()
+                    local miraHorizontal, miraVertical = obterRotacaoDoMira()
+                    
+                    local novaRotacaoHorizontal = rotacaoHorizontal + (anguloHorizontal - miraHorizontal) * fatorSuavidade
+                    local novaRotacaoVertical = rotacaoVertical + (anguloVertical - miraVertical) * fatorSuavidade
+                    
+                    definirRotacaoDaCamera(novaRotacaoHorizontal, novaRotacaoVertical)
                 end
             end
         end
@@ -703,47 +759,6 @@ function EspBoxCar() -- ESP CAR BOX
         end
     end
 end
-
-function se.onServerMessage(color, text) -- AUTO FILA
-    if GUI.AutoFila[0] then
-        local lowerText = string.lower(u8:decode(text))
-        if lowerText:find("fila") or lowerText:find("/fila") then
-            sampSendChat("/fila")
-        end
-    end
-end
-
-function se.onChatMessage(playerId, text)
-    if GUI.AutoFila[0] then
-        local lowerText = string.lower(u8:decode(text))
-        if lowerText:find("fila") or lowerText:find("/fila") then
-            sampSendChat("/fila")
-        end
-    end
-end
-
-function se.onShowDialog(id, style, title, button1, button2, text)
-    if GUI.AutoFila[0] then
-        local ttitle = string.lower(u8:decode(title))
-        if ttitle:find("fila de atendimento") then
-            lua_thread.create(function()
-                wait(50)
-                local firstLine = text:match("^(.-)\n") or text
-                if firstLine ~= "" then
-                    sampSendDialogResponse(id, 1, 0, firstLine)
-                    wait(100)
-                    sampSendDialogResponse(id, 0, 0, "")
-                    sampSendDialogResponse(id, 0, -1, "")
-                    sampSendDialogResponse(id, 0, -1, nil)
-                    sampSendDialogResponse(id, 1, -1, nil)
-                    sampSendDialogResponse(id, 0, 0, nil)
-                    Som1()
-                end
-            end)
-            return false
-        end
-    end
-end -- FIM AUTO FILA
 
 function EnviarSmS(text) -- TAG MESSAGEM
     tag = '{FF0000}[JhowModsOfc]: '
