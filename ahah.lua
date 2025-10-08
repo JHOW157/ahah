@@ -582,8 +582,13 @@ end
 
 function Aimbot()
     if GUI.AtivarAimbot[0] and isPlayerArmed() then
-        local distanciaMaxima = math.floor((GUI.DistanciaAimbot[0] - 1) * (200 - 10) / (100 - 1)) + 10
         local modoCamera = camera_principal.aCams[0].nMode
+        
+        if modoCamera ~= 7 and modoCamera ~= 53 then
+            return
+        end
+        
+        local distanciaMaxima = math.floor((GUI.DistanciaAimbot[0] - 1) * (200 - 10) / (100 - 1)) + 10
         local suavidadeMaxia = math.floor(100 + (GUI.SuavidadeAimbot[0] - 1) * (250 - 100) / (100 - 1))
         local largura, altura = getScreenResolution()
         local centroX, centroY = largura / 2, altura / 2
