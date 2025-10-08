@@ -169,18 +169,30 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
+            if imgui.Checkbox(" ANT HS", GUI.AntHs) then
+                Som1()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
+            imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.8, 0.0, 0.0, 1.0))
+            imgui.PushStyleColor(imgui.Col.ButtonHovered, imgui.ImVec4(1.0, 0.0, 0.0, 1.0))
+            imgui.PushStyleColor(imgui.Col.ButtonActive, imgui.ImVec4(0.6, 0.0, 0.0, 1.0))
+            if imgui.Button(" PUXAR VIDA (RISCO DE BAN)", imgui.ImVec2(350 * DPI, 40 * DPI)) then
+                Som1()
+                setCharHealth(PLAYER_PED, 100)
+            end
+            if imgui.Button(" PUXAR COLETE (RISCO DE BAN)", imgui.ImVec2(350 * DPI, 40 * DPI)) then
+                Som1()
+                addArmourToChar(PLAYER_PED, 100)
+            end
+            imgui.PopStyleColor(3)
+            imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if Toggle(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
                 Som1()
             end
-            imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
             if Slider("AJUSTAR FOV", GUI.AlterarFovTela, 10, 120, 400) then
                 if GUI.AtivarTelaEsticada[0] then
                     cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
                 end
-            end
-            imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
-            if imgui.Checkbox(" ANT HS", GUI.AntHs) then
-                Som1()
             end
         end
         if GUI.selected_category == "Aimbot" then
