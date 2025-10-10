@@ -255,6 +255,14 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             if imgui.Checkbox(" IGNORE AMIGOS (EM BREVE)", GUI.IgnoreAmigos) then
                 Som1()
             end
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+            if imgui.Checkbox(" IGNORE ADMIN (EM BREVE)", GUI.IgnoreObject) then
+                Som1()
+            end
+            imgui.SameLine(400)
+            if imgui.Checkbox(" IGNORE SKIN (EM BREVE)", GUI.IgnoreAmigos) then
+                Som1()
+            end
         end
         if GUI.selected_category == "visual" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
