@@ -53,6 +53,8 @@ local GUI = {
     IgnoreVeiculo = new.bool(false),
     IgnoreObject = new.bool(false),
     IgnoreAmigos = new.bool(false),
+    IgnoreAdmin = new.bool(false),
+    IgnoreSkin = new.bool(false),
     EspLine = new.bool(false),
     EspBox = new.bool(false),
     EspEsqueleto = new.bool(false),
@@ -256,11 +258,11 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" IGNORE ADMIN (EM BREVE)", GUI.IgnoreObject) then
+            if imgui.Checkbox(" IGNORE ADMIN (EM BREVE)", GUI.IgnoreAdmin) then
                 Som1()
             end
             imgui.SameLine(400)
-            if imgui.Checkbox(" IGNORE SKIN (EM BREVE)", GUI.IgnoreAmigos) then
+            if imgui.Checkbox(" IGNORE SKIN (EM BREVE)", GUI.IgnoreSkin) then
                 Som1()
             end
         end
