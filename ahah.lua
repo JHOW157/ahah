@@ -42,6 +42,7 @@ local GUI = {
     AtivarAimbot = new.bool(false),
     AtivarDraFov = new.bool(false),
     AntHs = new.bool(false),
+    GodMod = new.bool(false),
     FovAimbot = new.float(100),
     SuavidadeAimbot = new.int(100),
     DistanciaAimbot = new.float(100),
@@ -78,6 +79,7 @@ end
 
 local ui_scale = imgui.new.float(1.0)
 local DPI = 1.0
+local BotaoMob = imgui.ImVec2(380 * DPI, 40 * DPI)
 
 imgui.OnInitialize(function()
     DPI = getDPIScale() * ui_scale[0]
@@ -110,7 +112,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
     if imgui.Begin("##menu", nil, windowFlags) then
         local windowPos = imgui.GetWindowPos()
         local windowSize = imgui.GetWindowSize()
-        local buttonSize = 40
+        local buttonSize = 35 * DPI
         local xMarkPosX = windowSize.x - buttonSize - 10
         local xMarkPosY = 10
         imgui.SetCursorPos(imgui.ImVec2(xMarkPosX, xMarkPosY))
@@ -124,7 +126,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
         end
         imgui.PopStyleColor(4)
 
-        imgui.BeginChild("LeftPane", imgui.ImVec2(220 * DPI, 0), false)
+        imgui.BeginChild("LeftPane", imgui.ImVec2(215 * DPI, 0), false)
         if Imagem then
             imgui.Image(Imagem, imgui.ImVec2(200 * DPI, 200 * DPI))
             if imgui.IsItemClicked() then
@@ -147,7 +149,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             GUI.selected_category = "visual"
             Som2()
         end
-        imgui.Dummy(imgui.ImVec2(0, 80 * DPI))
+        imgui.Dummy(imgui.ImVec2(0, 70 * DPI))
         if imgui.Button(     faicons("GEAR") .. " CONFIG         ", categoria) then
             GUI.selected_category = "config"
             Som2()
@@ -174,23 +176,32 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             if imgui.Checkbox(" ANT HS", GUI.AntHs) then
                 Som1()
             end
+            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            if imgui.Checkbox(" GOD MOD LEGIT", GUI.GodMod) then
+                Som1()
+            end
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.8, 0.0, 0.0, 1.0))
             imgui.PushStyleColor(imgui.Col.ButtonHovered, imgui.ImVec4(1.0, 0.0, 0.0, 1.0))
             imgui.PushStyleColor(imgui.Col.ButtonActive, imgui.ImVec4(0.6, 0.0, 0.0, 1.0))
-            if imgui.Button(" PUXAR VIDA (RISCO DE BAN)", imgui.ImVec2(350 * DPI, 40 * DPI)) then
+            if imgui.Button(" PUXAR VIDA (RISCO DE BAN)", BotaoMob) then
                 Som1()
                 setCharHealth(PLAYER_PED, 100)
             end
-            if imgui.Button(" PUXAR COLETE (RISCO DE BAN)", imgui.ImVec2(350 * DPI, 40 * DPI)) then
+            if imgui.Button(" PUXAR COLETE (RISCO DE BAN)", BotaoMob) then
                 Som1()
                 addArmourToChar(PLAYER_PED, 100)
+            end
+            if imgui.Button(" SEMPRE DE DIA", BotaoMob) then
+                Som1()
+                ClimaHoras()
             end
             imgui.PopStyleColor(3)
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if Toggle(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
                 Som1()
             end
+            imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
             if Slider("AJUSTAR FOV", GUI.AlterarFovTela, 10, 120, 400) then
                 if GUI.AtivarTelaEsticada[0] then
                     cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
@@ -258,7 +269,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" IGNORE ADMIN (EM BREVE)", GUI.IgnoreAdmin) then
+            if imgui.Checkbox(" IGNORE ADMIN", GUI.IgnoreAdmin) then
                 Som1()
             end
             imgui.SameLine(400)
@@ -361,12 +372,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                     local alpha = (1 - dist / 100) * 255
                     local alphaF = alpha / 255
                     local lineColor = imgui.GetColorU32Vec4(imgui.ImVec4(1.0, 1.0, 1.0, alphaF))
-                    drawList:AddLine(
-                        imgui.ImVec2(winPosicao.x + p.posicao.x, winPosicao.y + p.posicao.y),
-                        imgui.ImVec2(winPosicao.x + p2.posicao.x, winPosicao.y + p2.posicao.y),
-                        lineColor,
-                        1.0
-                    )
+                    drawList:AddLine(imgui.ImVec2(winPosicao.x + p.posicao.x, winPosicao.y + p.posicao.y), imgui.ImVec2(winPosicao.x + p2.posicao.x, winPosicao.y + p2.posicao.y), lineColor, 1.0)
                 end
             end
         end
@@ -442,6 +448,10 @@ function main()
             DrawCirculo(centerX, centerY, radius, corFov)
         end
 
+        if GUI.GodMod[0] then
+            setCharProofs(PLAYER_PED, true, true, true, true, true)
+        end
+
         if GUI.EspSkinId[0] then
             for _, ped in ipairs(getAllChars()) do
                 if ped ~= playerPed and doesCharExist(ped) and isCharOnScreen(ped) then
@@ -463,7 +473,7 @@ function DrawCirculo(x, y, radius, color)
     for i = 1, segmentos do
         local newX = x + radius * math.cos(step * i)
         local newY = y + radius * math.sin(step * i)
-        renderDrawLine(oldX, oldY, newX, newY, 1, color)
+        renderDrawLine(oldX, oldY, newX, newY, 2 * DPI, color)
         oldX, oldY = newX, newY
     end
 end
@@ -476,6 +486,11 @@ end
 function IgnoreDrawFovArma() -- IGNORE ARMA SNIPER
     local weapon = getCurrentCharWeapon(PLAYER_PED)
     return weapon == 34
+end
+
+function isPlayerAdmin(ped)
+    local skinId = getCharModel(ped)
+    return skinId == 217 or skinId == 211
 end
 
 function se.onSetPlayerHealth() -- ANT HS
@@ -494,10 +509,10 @@ function EspInforVeiculos() -- ESP INFO VEICULO
                 if dist < 150.0 then
                     local carId = getCarModel(v)
                     local nomeModelo = carros[carId - 399] or "DESCONHECIDO"
-                    local _, vehicleServerId = sampGetVehicleIdByCarHandle(v)
+                    local _, IdVeiculoServer = sampGetVehicleIdByCarHandle(v)
                     local hp = getCarHealth(v)
                     local X, Y = convert3DCoordsToScreen(carX, carY, carZ + 1)
-                    local infoText = string.format("%s (%d) \n\nHP: %.0f", nomeModelo, vehicleServerId, hp)
+                    local infoText = string.format("%s (%d) \nHP: %.0f", nomeModelo, IdVeiculoServer, hp)
                     renderFontDrawText(EspFontCar, infoText, X, Y, 0xFFFF0000)
                 end
             end
@@ -623,18 +638,20 @@ function Aimbot()
         
         for _, char in ipairs(getAllChars()) do
             if isCharOnScreen(char) and char ~= PLAYER_PED and not isCharDead(char) then
-                local result, playerId = sampGetPlayerIdByCharHandle(char)
-                if result and not isTargetAfkAim(playerId) and not isPlayerInVehicleAim(char) then
-                    local posicaoX, posicaoY, posicaoZ = obterPosicaoDoOsso(char, 5)
-                    local distanciaTotal = getDistanceBetweenCoords3d(coordX, coordY, coordZ, posicaoX, posicaoY, posicaoZ)
-                    if distanciaTotal < distanciaMaxima then
-                        local sx, sy = convert3DCoordsToScreen(posicaoX, posicaoY, posicaoZ)
-                        if sx and sy then
-                            local distFov = math.sqrt((sx - centroX)^2 + (sy - centroY)^2)
-                            if distFov <= maxFovRadius * 2.0 then
-                                if not menorDistFov or distFov < menorDistFov then
-                                    menorDistFov = distFov
-                                    charProximo = char
+                if not isPlayerAdmin(char) then
+                    local result, playerId = sampGetPlayerIdByCharHandle(char)
+                    if result and not isTargetAfkAim(playerId) and not isPlayerInVehicleAim(char) then
+                        local posicaoX, posicaoY, posicaoZ = obterPosicaoDoOsso(char, 5)
+                        local distanciaTotal = getDistanceBetweenCoords3d(coordX, coordY, coordZ, posicaoX, posicaoY, posicaoZ)
+                        if distanciaTotal < distanciaMaxima then
+                            local sx, sy = convert3DCoordsToScreen(posicaoX, posicaoY, posicaoZ)
+                            if sx and sy then
+                                local distFov = math.sqrt((sx - centroX)^2 + (sy - centroY)^2)
+                                if distFov <= maxFovRadius * 2.0 then
+                                    if not menorDistFov or distFov < menorDistFov then
+                                        menorDistFov = distFov
+                                        charProximo = char
+                                    end
                                 end
                             end
                         end
@@ -722,7 +739,6 @@ end
 function EspLine() -- ESP LINE
     if GUI.EspLine[0] then
         local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
-        local thin = math.max(1.0, 1.25 * DPI)
         for playerId = 0, sampGetMaxPlayerId(false) do
             if sampIsPlayerConnected(playerId) then
                 local result, playerPed = sampGetCharHandleBySampPlayerId(playerId)
@@ -734,7 +750,7 @@ function EspLine() -- ESP LINE
                         local screenWidth, screenHeight = getScreenResolution()
                         local lineStartX = screenWidth / 2
                         local lineStartY = 0
-                        renderDrawLine(lineStartX, lineStartY, lineEndX, lineEndY, thin, 0xFFFF0000)
+                        renderDrawLine(lineStartX, lineStartY, lineEndX, lineEndY, 2 * DPI, 0xFFFF0000)
                     end
                 end
             end
@@ -742,11 +758,11 @@ function EspLine() -- ESP LINE
     end
 end
 
-function EspBoxCar() -- ESP CAR BOX
+function EspBoxCar() -- ESP BOX CARRO
     if GUI.EspCarro[0] then
         local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
         local x, y = convert3DCoordsToScreen(playerX, playerY, playerZ)
-        local thin = math.max(1.0, 1.25 * DPI)
+        local Linha = 2 * DPI
 
         for _, vehicle in ipairs(getAllVehicles()) do
             if isCarOnScreen(vehicle) then
@@ -773,15 +789,15 @@ function EspBoxCar() -- ESP CAR BOX
 
                 for i = 1, 4 do
                     local nextIndex = (i % 4 == 0 and i - 3) or (i + 1)
-                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, thin, 0xFFFFFFFF)
-                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[i + 4].x, boxCorners[i + 4].y, thin, 0xFFFFFFFF)
+                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, Linha, 0xFFFFFFFF)
+                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[i + 4].x, boxCorners[i + 4].y, Linha, 0xFFFFFFFF)
                 end
 
                 for i = 5, 8 do
                     local nextIndex = (i % 4 == 0 and i - 3) or (i + 1)
-                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, thin, 0xFFFFFFFF)
+                    renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, Linha, 0xFFFFFFFF)
                 end
-                renderDrawLine(x, y, px, py, thin, 0xFFFFFFFF)
+                renderDrawLine(x, y, px, py, Linha, 0xFFFFFFFF)
             end
         end
     end
@@ -844,7 +860,7 @@ function Som2() -- SOM 2
 end
 
 function Toggle(id, bool) -- BOTAO TOGGLE
-    local rBool = false
+    local VerificarToggle = false
 
     if UltimoTempoAtivo == nil then
         UltimoTempoAtivo = {}
@@ -867,7 +883,7 @@ function Toggle(id, bool) -- BOTAO TOGGLE
 
     if imgui.InvisibleButton(id, imgui.ImVec2(largura, altura)) then
         bool[0] = not bool[0]
-        rBool = true
+        VerificarToggle = true
         UltimoTempoAtivo[tostring(id)] = os.clock()
         UltimoAtivo[tostring(id)] = true
     end
@@ -894,11 +910,11 @@ function Toggle(id, bool) -- BOTAO TOGGLE
     dl:AddCircleFilled(imgui.ImVec2(p.x + raio + t * (largura - raio * 2.0), p.y + raio), raio - 1.5, col_circle, 30)
     imgui.SetCursorPos(imgui.ImVec2(butPos.x, butPos.y + altura + 5))
 
-    return rBool
+    return VerificarToggle
 end -- FIM BOTAO TOGGLE
 
 function Slider(id, value, min, max, width, format) -- BOTAO SLIDE
-    local rChanged = false
+    local VerificarSlider = false
     local DPI = imgui.GetIO().FontGlobalScale
     local p = imgui.GetCursorScreenPos()
     local dl = imgui.GetWindowDrawList()
@@ -925,7 +941,7 @@ function Slider(id, value, min, max, width, format) -- BOTAO SLIDE
         local newT = relativeX / largura
         newT = newT < 0 and 0 or (newT > 1 and 1 or newT)
         value[0] = min + newT * (max - min)
-        rChanged = true
+        VerificarSlider = true
     end
     
     if imgui.IsItemActive() and imgui.IsMouseDragging(0) then
@@ -934,7 +950,7 @@ function Slider(id, value, min, max, width, format) -- BOTAO SLIDE
         local newT = relativeX / largura
         newT = newT < 0 and 0 or (newT > 1 and 1 or newT)
         value[0] = min + newT * (max - min)
-        rChanged = true
+        VerificarSlider = true
     end
     
     imgui.SetCursorScreenPos(imgui.ImVec2(sliderStart.x + largura + 30 * DPI, p.y))
@@ -961,8 +977,14 @@ function Slider(id, value, min, max, width, format) -- BOTAO SLIDE
     
     imgui.SetCursorScreenPos(imgui.ImVec2(p.x, p.y + altura + 8 * DPI))
     
-    return rChanged
+    return VerificarSlider
 end -- FIM BOTAO SLIDE
+
+function ClimaHoras() -- CLIMA E HORAS
+    setTimeOfDay(11, 0)
+    forceWeatherNow(10)
+    EnviarSmS("{FFFFFF}TARDE E TEMPO LIMPO", -1)
+end
 
 function TemaVermelho()
     local style = imgui.GetStyle()
