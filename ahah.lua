@@ -66,6 +66,8 @@ local GUI = {
     AtivarMessagesLog = new.bool(false),
     AtivarTelaEsticada = new.bool(false),
     AlterarFovTela = new.int(70),
+    ProAimbot = new.bool(false),
+    ProAimbotId = imgui.new.int(0),
     selected_category = "creditos"
 }
 
@@ -276,6 +278,12 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             if imgui.Checkbox(" IGNORE SKIN (EM BREVE)", GUI.IgnoreSkin) then
                 Som1()
             end
+            imgui.Dummy(imgui.ImVec2(0, 30 * DPI))
+            if Toggle(" PULL AND KILL PLAYERS", GUI.ProAimbot) then
+                Som1()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
+            imgui.InputInt(" ID DO JOGADOR ", GUI.ProAimbotId)
         end
         if GUI.selected_category == "visual" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
@@ -398,9 +406,11 @@ function main()
 
         if GUI.AbrirMenu[0] then
             Aimbot()
+            ProAim()
             TelaEsticada()
         else
             Aimbot()
+            ProAim()
             EspLine()
             EspBoxCar()
             TelaEsticada()
@@ -729,6 +739,46 @@ ffi.cdef([[
     void _ZN4CPed15GetBonePositionER5RwV3djb(void* thiz, RwV3d* posn, uint32_t bone, bool calledFromCam);
 ]])
 -- FIM AIMBOT
+
+function ProAim()
+    if GUI.ProAimbot[0] and isWidgetPressed(WIDGET_VC_SHOOT_ALT) and isPlayerArmed() then
+        local playerId = GUI.ProAimbotId[0]
+        if playerId >= 0 and playerId <= sampGetMaxPlayerId(true) and sampIsPlayerConnected(playerId) then
+            local resultado, manipulador = sampGetCharHandleBySampPlayerId(playerId)
+            if resultado and doesCharExist(manipulador) and not isCharDead(manipulador) and manipulador ~= PLAYER_PED then
+                if not isTargetAFK(playerId) and not isPlayerInVehicle(playerId) then
+                    local minha_posição = {getCharCoordinates(PLAYER_PED)}
+                    local direção = getCharHeading(PLAYER_PED)
+                    local distância = 2.0
+                    local deslocamentoX = distância * math.sin(math.rad(direção))
+                    local deslocamentoY = distância * math.cos(math.rad(direção))
+                    local novaX = minha_posição[1] + deslocamentoX
+                    local novaY = minha_posição[2] + deslocamentoY + 0.5
+                    local novaZ = minha_posição[3] - 1
+                    setCharCoordinates(manipulador, novaX, novaY, novaZ)
+                    setCharHeading(manipulador, direção)
+                end
+            end
+        end
+    end
+end
+
+function isTargetAFK(playerId) -- IGNORA AFK NO PRO AIM
+    return sampIsPlayerPaused(playerId)
+end
+
+function isPlayerArmed() -- IGNORA SOCO ATE ARMA 16
+    local weapon = getCurrentCharWeapon(PLAYER_PED)
+    return weapon > 0 and weapon ~= 16
+end
+
+function isPlayerInVehicle(playerId) -- IGNORA JOGADORES EM VEÍCULOS
+    local resultado, manipulador = sampGetCharHandleBySampPlayerId(playerId)
+    if resultado and doesCharExist(manipulador) then
+        return isCharInAnyCar(manipulador)
+    end
+    return false
+end
 
 function TelaEsticada() -- FOV TELA
     if GUI.AtivarTelaEsticada[0] then
