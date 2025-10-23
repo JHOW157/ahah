@@ -68,6 +68,9 @@ local GUI = {
     AlterarFovTela = new.int(70),
     ProAimbot = new.bool(false),
     ProAimbotId = imgui.new.int(0),
+    AtivarDiaClima = new.bool(false),
+    SetClima = new.int(0),
+    SetDia = new.int(30),
     selected_category = "creditos"
 }
 
@@ -194,10 +197,6 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 Som1()
                 addArmourToChar(PLAYER_PED, 100)
             end
-            if imgui.Button(" SEMPRE DE DIA", BotaoMob) then
-                Som1()
-                ClimaHoras()
-            end
             imgui.PopStyleColor(3)
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if Toggle(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
@@ -209,6 +208,14 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                     cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
                 end
             end
+            imgui.Dummy(imgui.ImVec2(0, 20 * DPI))
+            if Toggle(" ATIVAR CLIMA/TEMPO (BETA)", GUI.AtivarDiaClima) then
+                Som1()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            Slider("TEMPO", GUI.SetDia, 1, 23, 400)
+            imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
+            Slider("CLIMA", GUI.SetClima, 1, 45, 400)
         end
         if GUI.selected_category == "Aimbot" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
@@ -417,6 +424,11 @@ function main()
             CarregarMessagesLog()
             EspInforVeiculos()
         end
+
+        if GUI.AtivarDiaClima[0] then
+			setTimeOfDay(GUI.SetDia[0], 0)
+			forceWeatherNow(GUI.SetClima[0])
+		end
         
         if GUI.AtivarDraFov[0] and GUI.AtivarAimbot[0] and isPlayerArmed() and not IgnoreDrawFovArma() then -- DRAW FOV AIMBOT
             local centerX = (screenWidth / 2) + 40 * DPI
@@ -1029,12 +1041,6 @@ function Slider(id, value, min, max, width, format) -- BOTAO SLIDE
     
     return VerificarSlider
 end -- FIM BOTAO SLIDE
-
-function ClimaHoras() -- CLIMA E HORAS
-    setTimeOfDay(11, 0)
-    forceWeatherNow(10)
-    EnviarSmS("{FFFFFF}TARDE E TEMPO LIMPO", -1)
-end
 
 function TemaVermelho()
     local style = imgui.GetStyle()
