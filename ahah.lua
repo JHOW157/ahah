@@ -2,6 +2,7 @@ local imgui = require "mimgui"
 local new = imgui.new
 local widgets = require("widgets")
 local faicons = require('fAwesome6')
+local se = require("samp.events")
 local ffi = require("ffi")
 local gtasa = ffi.load("GTASA")
 local vector3d = require("vector3d")
@@ -11,11 +12,14 @@ local encoding = require("encoding")
 encoding.default = "CP1251"
 local u8 = encoding.UTF8
 
+-- ALEATORIO
+local camModes = {7, 8, 34, 45, 46, 51, 65}
 -- RESOLUCAO DA TELA
 local screenWidth, screenHeight = getScreenResolution()
 -- FONTE
-local EspFontCar = renderCreateFont("Arial", 16, 12)
-local EspSkin = renderCreateFont("Arial", 9, 4)
+local FontEspCar = renderCreateFont("Arial", 16, 12)
+local FontEspSkinId = renderCreateFont("Arial", 10, 5)
+local FontEspNome = renderCreateFont("Arial", 15, 9)
 -- AIMBOT
 memory.require("CCamera")
 local camera_principal = memory.camera
@@ -71,6 +75,7 @@ local GUI = {
     AtivarDiaClima = new.bool(false),
     SetClima = new.int(0),
     SetDia = new.int(30),
+    AntCrash = new.bool(false),
     selected_category = "creditos"
 }
 
@@ -189,11 +194,11 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.8, 0.0, 0.0, 1.0))
             imgui.PushStyleColor(imgui.Col.ButtonHovered, imgui.ImVec4(1.0, 0.0, 0.0, 1.0))
             imgui.PushStyleColor(imgui.Col.ButtonActive, imgui.ImVec4(0.6, 0.0, 0.0, 1.0))
-            if imgui.Button(" PUXAR VIDA (RISCO DE BAN)", BotaoMob) then
+            if imgui.Button(" PUXAR VIDA", BotaoMob) then
                 Som1()
                 setCharHealth(PLAYER_PED, 100)
             end
-            if imgui.Button(" PUXAR COLETE (RISCO DE BAN)", BotaoMob) then
+            if imgui.Button(" PUXAR COLETE", BotaoMob) then
                 Som1()
                 addArmourToChar(PLAYER_PED, 100)
             end
@@ -203,19 +208,23 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
-            if Slider("AJUSTAR FOV", GUI.AlterarFovTela, 10, 120, 400) then
-                if GUI.AtivarTelaEsticada[0] then
-                    cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
+            if GUI.AtivarTelaEsticada[0] then
+                if Slider("AJUSTAR FOV", GUI.AlterarFovTela, 10, 120, 400) then
+                    if GUI.AtivarTelaEsticada[0] then
+                        cameraSetLerpFov(GUI.AlterarFovTela[0], 101, 1000, true)
+                    end
                 end
+                imgui.Dummy(imgui.ImVec2(0, 20 * DPI))
             end
-            imgui.Dummy(imgui.ImVec2(0, 20 * DPI))
             if Toggle(" ATIVAR CLIMA/TEMPO (BETA)", GUI.AtivarDiaClima) then
                 Som1()
             end
-            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            Slider("TEMPO", GUI.SetDia, 1, 23, 400)
-            imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
-            Slider("CLIMA", GUI.SetClima, 1, 45, 400)
+            if GUI.AtivarDiaClima[0] then
+                imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+                Slider("TEMPO", GUI.SetDia, 1, 23, 400)
+                imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
+                Slider("CLIMA", GUI.SetClima, 1, 45, 400)
+            end
         end
         if GUI.selected_category == "Aimbot" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
@@ -234,63 +243,67 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
-            if Toggle(" ATIVAR DRAW FOV", GUI.AtivarDraFov) then
+            if GUI.AtivarAimbot[0] then
+                if Toggle(" ATIVAR DRAW FOV", GUI.AtivarDraFov) then
+                    Som1()
+                end
+                imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+                Slider("FOV AIMBOT", GUI.FovAimbot, 1, 100, 400)
+                imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+                Slider("SUAVIDADE", GUI.SuavidadeAimbot, 1, 100, 400)
+                imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+                Slider("DISTANCIA", GUI.DistanciaAimbot, 1, 100, 400)
+                imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+                Slider("ALTURA Y", GUI.AlturaY, 0.39, 0.55, 400, "%.4f")
+                imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+                Slider("LAGURA X", GUI.LaguraX, 0.39, 0.55, 400, "%.4f")
+                imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+                if imgui.Checkbox(" CABECA", GUI.Cabeca) then
+                    Som1()
+                    GUI.Peito[0] = false
+                    GUI.AlturaY[0] = 0.4381
+                    GUI.LaguraX[0] = 0.5211
+                end
+                imgui.SameLine(400)
+                if imgui.Checkbox(" PEITO", GUI.Peito) then
+                    Som1()
+                    GUI.Cabeca[0] = false
+                    GUI.AlturaY[0] = 0.4111
+                    GUI.LaguraX[0] = 0.5199
+                end
+                imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+                if imgui.Checkbox(" IGNORE AFK", GUI.IgnoreAfkAim) then
+                    Som1()
+                end
+                imgui.SameLine(400)
+                if imgui.Checkbox(" IGNORE VEICULOS", GUI.IgnoreVeiculo) then
+                    Som1()
+                end
+                imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+                if imgui.Checkbox(" IGNORE OBJETOS", GUI.IgnoreObject) then
+                    Som1()
+                end
+                imgui.SameLine(400)
+                if imgui.Checkbox(" IGNORE AMIGOS (EM BREVE)", GUI.IgnoreAmigos) then
+                    Som1()
+                end
+                imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+                if imgui.Checkbox(" IGNORE ADMIN", GUI.IgnoreAdmin) then
+                    Som1()
+                end
+                imgui.SameLine(400)
+                if imgui.Checkbox(" IGNORE SKIN (EM BREVE)", GUI.IgnoreSkin) then
+                    Som1()
+                end
+                imgui.Dummy(imgui.ImVec2(0, 30 * DPI))
+            end
+            if Toggle(" ATIVAR PUXAR E MATA JOGADORES", GUI.ProAimbot) then
                 Som1()
             end
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            Slider("FOV AIMBOT", GUI.FovAimbot, 1, 100, 400)
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            Slider("SUAVIDADE", GUI.SuavidadeAimbot, 1, 100, 400)
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            Slider("DISTANCIA", GUI.DistanciaAimbot, 1, 100, 400)
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            Slider("ALTURA Y", GUI.AlturaY, 0.39, 0.55, 400, "%.4f")
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            Slider("LAGURA X", GUI.LaguraX, 0.39, 0.55, 400, "%.4f")
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" CABECA", GUI.Cabeca) then
-                Som1()
-                GUI.Peito[0] = false
-                GUI.AlturaY[0] = 0.4381
-                GUI.LaguraX[0] = 0.5211
+            if GUI.ProAimbot[0] then
+                imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
+                imgui.InputInt(" ID DO JOGADOR ", GUI.ProAimbotId)
             end
-            imgui.SameLine(400)
-            if imgui.Checkbox(" PEITO", GUI.Peito) then
-                Som1()
-                GUI.Cabeca[0] = false
-                GUI.AlturaY[0] = 0.4111
-                GUI.LaguraX[0] = 0.5199
-            end
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" IGNORE AFK", GUI.IgnoreAfkAim) then
-                Som1()
-            end
-            imgui.SameLine(400)
-            if imgui.Checkbox(" IGNORE VEICULOS", GUI.IgnoreVeiculo) then
-                Som1()
-            end
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" IGNORE OBJETOS", GUI.IgnoreObject) then
-                Som1()
-            end
-            imgui.SameLine(400)
-            if imgui.Checkbox(" IGNORE AMIGOS (EM BREVE)", GUI.IgnoreAmigos) then
-                Som1()
-            end
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" IGNORE ADMIN", GUI.IgnoreAdmin) then
-                Som1()
-            end
-            imgui.SameLine(400)
-            if imgui.Checkbox(" IGNORE SKIN (EM BREVE)", GUI.IgnoreSkin) then
-                Som1()
-            end
-            imgui.Dummy(imgui.ImVec2(0, 30 * DPI))
-            if Toggle(" PULL AND KILL PLAYERS", GUI.ProAimbot) then
-                Som1()
-            end
-            imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
-            imgui.InputInt(" ID DO JOGADOR ", GUI.ProAimbotId)
         end
         if GUI.selected_category == "visual" then
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
@@ -305,23 +318,19 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Text(textCredit)
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
+            if imgui.Checkbox(" ESP NOME", GUI.EspNome) then
+                Som1()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP LINE", GUI.EspLine) then
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+            if imgui.Checkbox(" ESP BOX", GUI.EspBox) then
+                Som1()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP SKIN ID", GUI.EspSkinId) then
-                Som1()
-            end
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" ESP ESQUELETO (EM BREVE)", GUI.EspEsqueleto) then
-                Som1()
-            end
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" ESP BOX (EM BREVE)", GUI.EspBox) then
-                Som1()
-            end
-            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-            if imgui.Checkbox(" ESP NOME (EM BREVE)", GUI.EspNome) then
                 Som1()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
@@ -330,6 +339,10 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP CARRO", GUI.EspCarro) then
+                Som1()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+            if imgui.Checkbox(" ESP ESQUELETO (EM BREVE)", GUI.EspEsqueleto) then
                 Som1()
             end
         end
@@ -347,6 +360,10 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Separator()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" LOG SERVIDOR", GUI.AtivarMessagesLog) then
+                Som1()
+            end
+            imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
+            if imgui.Checkbox(" ANT CRASH MOBILE", GUI.AntCrash) then
                 Som1()
             end
         end
@@ -419,6 +436,7 @@ function main()
             Aimbot()
             ProAim()
             EspLine()
+            EspNome()
             EspBoxCar()
             TelaEsticada()
             CarregarMessagesLog()
@@ -479,7 +497,54 @@ function main()
                 if ped ~= playerPed and doesCharExist(ped) and isCharOnScreen(ped) then
                     local cx, cy, cz = getCharCoordinates(ped)
                     local x, y = convert3DCoordsToScreen(cx, cy, cz)
-                    renderFontDrawText(EspSkin, string.format("ID DA SKIN: %d", getCharModel(ped)), x, y, 0xFF00FF00)
+                    renderFontDrawText(FontEspSkinId, string.format("ID DA SKIN: %d", getCharModel(ped)), x, y, 0xFF00FF00)
+                end
+            end
+        end
+
+        if GUI.EspBox[0] then
+            for jogador_id = 0, 999 do
+                local handle_personagem, id_personagem = sampGetCharHandleBySampPlayerId(jogador_id)
+
+                if handle_personagem then
+                    local coordenadas_personagem = {}
+                    coordenadas_personagem.x, coordenadas_personagem.y, coordenadas_personagem.z = getCharCoordinates(id_personagem)
+
+                    local pontos = {
+                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
+                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
+                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
+                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
+                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
+                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
+                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 },
+                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
+                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
+                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
+                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
+                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
+                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
+                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 },
+                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 },
+                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 }
+                    }
+
+                    local todosPontosNaTela = true
+                    for _, ponto in ipairs(pontos) do
+                        if not isPointOnScreen(ponto.x, ponto.y, ponto.z, 0) then
+                            todosPontosNaTela = false
+                            break
+                        end
+                    end
+
+                    if todosPontosNaTela then
+                        for i = 1, #pontos do
+                            local proximoIndice = (i % #pontos) + 1
+                            local x1, y1 = convert3DCoordsToScreen(pontos[i].x, pontos[i].y, pontos[i].z)
+                            local x2, y2 = convert3DCoordsToScreen(pontos[proximoIndice].x, pontos[proximoIndice].y, pontos[proximoIndice].z)
+                            renderDrawLine(x1, y1, x2, y2, 2, 0xFFFF0000)
+                        end
+                    end
                 end
             end
         end
@@ -535,7 +600,7 @@ function EspInforVeiculos() -- ESP INFO VEICULO
                     local hp = getCarHealth(v)
                     local X, Y = convert3DCoordsToScreen(carX, carY, carZ + 1)
                     local infoText = string.format("%s (%d) \nHP: %.0f", nomeModelo, IdVeiculoServer, hp)
-                    renderFontDrawText(EspFontCar, infoText, X, Y, 0xFFFF0000)
+                    renderFontDrawText(FontEspCar, infoText, X, Y, 0xFFFF0000)
                 end
             end
         end
@@ -820,6 +885,58 @@ function EspLine() -- ESP LINE
     end
 end
 
+function EspNome()
+    if GUI.EspNome[0] then
+        if doesCharExist(PLAYER_PED) then
+            local jogadorX, jogadorY, jogadorZ = getCharCoordinates(PLAYER_PED)
+            for _, personagem in ipairs(getAllChars()) do
+                if personagem ~= PLAYER_PED and doesCharExist(personagem) and isCharOnScreen(personagem) and not isCharDead(personagem) then
+                    local resultado, idJogador = sampGetPlayerIdByCharHandle(personagem)
+                    if resultado then
+
+                        local ossoX, ossoY, ossoZ = obterPosicaoDoOsso(personagem, 5)
+                        if not ossoX or not ossoY or not ossoZ then
+                            ossoX, ossoY, ossoZ = getCharCoordinates(personagem)
+                        end
+
+                        local distanciaTotal = getDistanceBetweenCoords3d(jogadorX, jogadorY, jogadorZ, ossoX, ossoY, ossoZ)
+
+                        if distanciaTotal > 17.9 then
+                            local telaX, telaY = convert3DCoordsToScreen(ossoX, ossoY, ossoZ + 0.5)
+                            if telaX and telaY then
+                                local nomeJogador = sampGetPlayerNickname(idJogador)
+                                local texto = string.format("%s (%d)", nomeJogador, idJogador)
+                                renderFontDrawText(FontEspNome, texto, telaX - (#texto * 5) * DPI, telaY - 25 * DPI, 0xFFFFFFFF)
+
+                                local vida = sampGetPlayerHealth(idJogador)
+                                local colete = sampGetPlayerArmor(idJogador)
+
+                                local larguraBarra = 70 * DPI
+                                local alturaBarra = 8 * DPI
+
+                                local larguraVida = (vida / 100) * larguraBarra
+                                local larguraColete = (colete / 100) * larguraBarra
+
+                                local posBarraX = telaX - (larguraBarra / 2)
+                                local posBarraY = telaY - 2 * DPI
+
+                                renderDrawBoxWithBorder(posBarraX, posBarraY, larguraBarra, alturaBarra, 0xFF300000, 1, 0xFF300000)
+                                renderDrawBoxWithBorder(posBarraX, posBarraY, larguraVida, alturaBarra, 0xFFFF0000, 1, 0x00000000)
+
+                                if colete > 0 then
+                                    local posColeteY = posBarraY + alturaBarra + 2 * DPI
+                                    renderDrawBoxWithBorder(posBarraX, posColeteY, larguraBarra, alturaBarra, 0xFF300000, 1, 0xFF300000)
+                                    renderDrawBoxWithBorder(posBarraX, posColeteY, larguraColete, alturaBarra, 0xFFFFFFFF, 1, 0x00000000)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 function EspBoxCar() -- ESP BOX CARRO
     if GUI.EspCarro[0] then
         local playerX, playerY, playerZ = getCharCoordinates(PLAYER_PED)
@@ -860,6 +977,17 @@ function EspBoxCar() -- ESP BOX CARRO
                     renderDrawLine(boxCorners[i].x, boxCorners[i].y, boxCorners[nextIndex].x, boxCorners[nextIndex].y, Linha, 0xFFFFFFFF)
                 end
                 renderDrawLine(x, y, px, py, Linha, 0xFFFFFFFF)
+            end
+        end
+    end
+end
+
+function se.onAimSync(playerId, data)
+    if GUI.AntCrash[0] then
+        for aa, i in pairs(camModes) do
+            if data.camMode == i then
+                EnviarSmS("{FFFFFF}O Suspeito (ID: ".. playerId ..") Esta tentando te crashar")
+                return false
             end
         end
     end
