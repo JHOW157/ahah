@@ -13,6 +13,7 @@ encoding.default = "CP1251"
 local u8 = encoding.UTF8
 
 -- ALEATORIO
+local notificacoes = {} --FUNCAO DE NOTIFICACAO
 local camModes = {7, 8, 34, 45, 46, 51, 65}
 -- RESOLUCAO DA TELA
 local screenWidth, screenHeight = getScreenResolution()
@@ -185,10 +186,12 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" ANT HS", GUI.AntHs) then
                 Som1()
+                MostrarNotificacao("ANT HS", GUI.AntHs[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             if imgui.Checkbox(" GOD MOD LEGIT", GUI.GodMod) then
                 Som1()
+                MostrarNotificacao("GOD MOD LEGIT", GUI.GodMod[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.8, 0.0, 0.0, 1.0))
@@ -204,8 +207,9 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             end
             imgui.PopStyleColor(3)
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
-            if Toggle(" ATIVAR FOV", GUI.AtivarTelaEsticada) then
+            if Toggle(" ATIVAR FOV TELA", GUI.AtivarTelaEsticada) then
                 Som1()
+                MostrarNotificacao("FOV TELA", GUI.AtivarTelaEsticada[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
             if GUI.AtivarTelaEsticada[0] then
@@ -218,6 +222,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             end
             if Toggle(" ATIVAR CLIMA/TEMPO (BETA)", GUI.AtivarDiaClima) then
                 Som1()
+                MostrarNotificacao("CLIMA/TEMPO", GUI.AtivarDiaClima[0])
             end
             if GUI.AtivarDiaClima[0] then
                 imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
@@ -241,11 +246,13 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if Toggle(" ATIVAR AIMBOT", GUI.AtivarAimbot) then
                 Som1()
+                MostrarNotificacao("AIMBOT", GUI.AtivarAimbot[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             if GUI.AtivarAimbot[0] then
                 if Toggle(" ATIVAR DRAW FOV", GUI.AtivarDraFov) then
                     Som1()
+                    MostrarNotificacao("DRAW FOV", GUI.AtivarDraFov[0])
                 end
                 imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
                 Slider("FOV AIMBOT", GUI.FovAimbot, 1, 100, 400)
@@ -260,6 +267,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
                 if imgui.Checkbox(" CABECA", GUI.Cabeca) then
                     Som1()
+                    MostrarNotificacao("CABECA", GUI.Cabeca[0])
                     GUI.Peito[0] = false
                     GUI.AlturaY[0] = 0.4381
                     GUI.LaguraX[0] = 0.5211
@@ -267,6 +275,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 imgui.SameLine(400)
                 if imgui.Checkbox(" PEITO", GUI.Peito) then
                     Som1()
+                    MostrarNotificacao("PEITO", GUI.Peito[0])
                     GUI.Cabeca[0] = false
                     GUI.AlturaY[0] = 0.4111
                     GUI.LaguraX[0] = 0.5199
@@ -274,31 +283,38 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
                 if imgui.Checkbox(" IGNORE AFK", GUI.IgnoreAfkAim) then
                     Som1()
+                    MostrarNotificacao("IGNORE AFK", GUI.IgnoreAfkAim[0])
                 end
                 imgui.SameLine(400)
                 if imgui.Checkbox(" IGNORE VEICULOS", GUI.IgnoreVeiculo) then
                     Som1()
+                    MostrarNotificacao("IGNORE VEICULOS", GUI.IgnoreVeiculo[0])
                 end
                 imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
                 if imgui.Checkbox(" IGNORE OBJETOS", GUI.IgnoreObject) then
                     Som1()
+                    MostrarNotificacao("IGNORE OBJETOS", GUI.IgnoreObject[0])
                 end
                 imgui.SameLine(400)
                 if imgui.Checkbox(" IGNORE AMIGOS (EM BREVE)", GUI.IgnoreAmigos) then
                     Som1()
+                    MostrarNotificacao("IGNORE AMIGOS (EM BREVE)", GUI.IgnoreAmigos[0])
                 end
                 imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
                 if imgui.Checkbox(" IGNORE ADMIN", GUI.IgnoreAdmin) then
                     Som1()
+                    MostrarNotificacao("IGNORE ADMIN", GUI.IgnoreAdmin[0])
                 end
                 imgui.SameLine(400)
                 if imgui.Checkbox(" IGNORE SKIN (EM BREVE)", GUI.IgnoreSkin) then
                     Som1()
+                    MostrarNotificacao("IGNORE SKIN (EM BREVE)", GUI.IgnoreSkin[0])
                 end
                 imgui.Dummy(imgui.ImVec2(0, 30 * DPI))
             end
             if Toggle(" ATIVAR PUXAR E MATA JOGADORES", GUI.ProAimbot) then
                 Som1()
+                MostrarNotificacao("PUXAR E MATA", GUI.ProAimbot[0])
             end
             if GUI.ProAimbot[0] then
                 imgui.Dummy(imgui.ImVec2(0, 5 * DPI))
@@ -320,30 +336,37 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" ESP NOME", GUI.EspNome) then
                 Som1()
+                MostrarNotificacao("ESP NOME", GUI.EspNome[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP LINE", GUI.EspLine) then
                 Som1()
+                MostrarNotificacao("ESP LINE", GUI.EspLine[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP BOX", GUI.EspBox) then
                 Som1()
+                MostrarNotificacao("ESP BOX", GUI.EspBox[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP SKIN ID", GUI.EspSkinId) then
                 Som1()
+                MostrarNotificacao("ESP SKIN ID", GUI.EspSkinId[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP INFO VEICULO", GUI.EspInfoCar) then
                 Som1()
+                MostrarNotificacao("ESP INFO VEICULO", GUI.EspInfoCar[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP CARRO", GUI.EspCarro) then
                 Som1()
+                MostrarNotificacao("ESP CARRO", GUI.EspCarro[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP ESQUELETO (EM BREVE)", GUI.EspEsqueleto) then
                 Som1()
+                MostrarNotificacao("ESP ESQUELETO (EM BREVE)", GUI.EspEsqueleto[0])
             end
         end
         if GUI.selected_category == "config" then
@@ -361,10 +384,12 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if imgui.Checkbox(" LOG SERVIDOR", GUI.AtivarMessagesLog) then
                 Som1()
+                MostrarNotificacao("LOG SERVIDOR", GUI.AtivarMessagesLog[0])
             end
             imgui.Dummy(imgui.ImVec2(0, 10 * DPI))
             if imgui.Checkbox(" ANT CRASH MOBILE", GUI.AntCrash) then
                 Som1()
+                MostrarNotificacao("ANT CRASH MOBILE", GUI.AntCrash[0])
             end
         end
         if GUI.selected_category == "creditos" then
@@ -411,6 +436,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
     end
 
     imgui.End()
+    DesenharNotificacoes()
 end)
 
 function main()
@@ -997,6 +1023,46 @@ function EnviarSmS(text) -- TAG MESSAGEM
     tag = '{FF0000}[JhowModsOfc]: '
     sampAddChatMessage(tag .. text, -1)
 end
+
+function MostrarNotificacao(tipo, estado) -- NOTIFICACAO
+    table.insert(notificacoes, {
+        texto = tipo..(estado and " (ON)" or " (OFF)"),
+        tempo = os.clock() + 5,
+        y_offset = 0,
+        estado = estado
+    })
+end
+    
+function DesenharNotificacoes()
+    local LaguraX, AlturaY = getScreenResolution()
+    local alturaNotificacao = 70 * DPI
+    local espacamento = 10 * DPI
+    local posX = LaguraX - 550 * DPI
+    local posYBase = AlturaY - 150 * DPI
+    
+    for i = #notificacoes, 1, -1 do
+        local notif = notificacoes[i]
+        if os.clock() > notif.tempo then
+            table.remove(notificacoes, i)
+        else
+            notif.y_offset = (#notificacoes - i) * (alturaNotificacao + espacamento)
+            local posY = posYBase - notif.y_offset
+            
+            imgui.SetNextWindowPos(imgui.ImVec2(posX, posY))
+            imgui.SetNextWindowSize(imgui.ImVec2(230 * DPI, alturaNotificacao))
+            imgui.Begin("Notificacao_"..i, nil, imgui.WindowFlags.NoResize + imgui.WindowFlags.NoTitleBar + imgui.WindowFlags.NoMove + imgui.WindowFlags.NoScrollbar)
+            if notif.estado then
+                imgui.PushStyleColor(imgui.Col.Text, imgui.ImVec4(0.0, 1.0, 0.0, 1.0)) -- Verde
+            else
+                imgui.PushStyleColor(imgui.Col.Text, imgui.ImVec4(1.0, 0.0, 0.0, 1.0)) -- Vermelho
+            end
+            imgui.Text(notif.texto)
+            imgui.PopStyleColor()
+            
+            imgui.End()
+        end
+    end
+end -- FIM NOTIFICACAO
 
 function CarregarMessagesLog() -- LOG DO SERVER
     if GUI.AtivarMessagesLog[0] then
