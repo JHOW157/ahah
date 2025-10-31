@@ -37,8 +37,8 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
     imgui.TextColored(imgui.ImVec4(1.0, 1.0, 1.0, 1.0), "ATUALIZAÇÃO, HEX DUMP TEAM")
     
     imgui.SetCursorPosY(350 * DPI)
-    imgui.SetCursorPosX((windowSize.x - imgui.CalcTextSize("Menu em atualização, Voltamos 31/10/2025 ás 15:00").x) / 2)
-    imgui.TextColored(imgui.ImVec4(1.0, 0.0, 0.0, 1.0), "Menu em atualização, Voltamos 31/10/2025 ás 15:00")
+    imgui.SetCursorPosX((windowSize.x - imgui.CalcTextSize("Menu em atualização, Voltamos 31/10/2025 ás 15:30").x) / 2)
+    imgui.TextColored(imgui.ImVec4(1.0, 0.0, 0.0, 1.0), "Menu em atualização, Voltamos 31/10/2025 ás 15:30")
     
     imgui.End()
 end)
