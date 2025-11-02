@@ -13,8 +13,11 @@ local encoding = require("encoding")
 encoding.default = "CP1251"
 local u8 = encoding.UTF8
 
--- ALEATORIO
-local notificacoes = {} --FUNCAO DE NOTIFICACAO
+-- PLATAFORMA
+local players = {}
+local FontPlataforma = renderCreateFont('Arial', 10, 12)
+-- FUNCAO DE NOTIFICACAO
+local notificacoes = {}
 local camModes = {7, 8, 34, 45, 46, 51, 65}
 -- RESOLUCAO DA TELA
 local screenWidth, screenHeight = getScreenResolution()
@@ -151,6 +154,7 @@ local GUI = {
     IgnoreSkin = new.bool(config.ConfigHexDump.IgnoreSkin),
     EspLine = new.bool(config.ConfigHexDump.EspLine),
     EspBox = new.bool(config.ConfigHexDump.EspBox),
+    EspPlataforma = new.bool(false),
     EspEsqueleto = new.bool(false),
     EspSkinId = new.bool(false),
     EspNome = new.bool(config.ConfigHexDump.EspNome),
@@ -473,6 +477,11 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 SalvarConfig()
             end
             imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
+            if imgui.Checkbox(" ESP PLATAFORMA", GUI.EspPlataforma) then
+                Som1()
+                MostrarNotificacao("ESP PLATAFORMA", GUI.EspPlataforma[0])
+            end
+            imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
             if imgui.Checkbox(" ESP SKIN ID", GUI.EspSkinId) then
                 Som1()
                 MostrarNotificacao("ESP SKIN ID", GUI.EspSkinId[0])
@@ -698,6 +707,20 @@ function main()
                             local x2, y2 = convert3DCoordsToScreen(pontos[proximoIndice].x, pontos[proximoIndice].y, pontos[proximoIndice].z)
                             renderDrawLine(x1, y1, x2, y2, 2, 0xFFFF0000)
                         end
+                    end
+                end
+            end
+        end
+
+        if GUI.EspPlataforma[0] then
+            local peds = getAllChars()
+            for i=2, #peds do
+                local _, id = sampGetPlayerIdByCharHandle(peds[i])
+                if peds[i] ~= nil and isCharOnScreen(peds[i]) and not sampIsPlayerNpc(id) then
+                    local x, y, z = getCharCoordinates(peds[i])
+                    local xs, ys = convert3DCoordsToScreen(x, y, z)
+                    if players[id] ~= nil then
+                        renderFontDrawText(FontPlataforma, players[id], xs - 23, ys, 0xFF32FF16)
                     end
                 end
             end
@@ -1147,6 +1170,46 @@ function se.onAimSync(playerId, data)
     end
 end
 
+-- PLATAFORMA
+function se.onUnoccupiedSync(id, data)
+    players[id] = "PC"
+end
+
+function se.onPlayerSync(id, data)
+    if data.keysData == 160 then
+        players[id] = "PC"
+    end
+    if data.specialAction ~= 0 and data.specialAction ~= 1 then
+        players[id] = "PC"
+    end
+    if data.leftRightKeys ~= nil then
+        if data.leftRightKeys ~= 128 and data.leftRightKeys ~= 65408 then
+            players[id] = "Mobile"
+        else
+            if players[id] ~= "Mobile" then
+                players[id] = "PC"
+            end
+        end
+    end
+    if data.upDownKeys ~= nil then
+        if data.upDownKeys ~= 128 and data.upDownKeys ~= 65408 then
+            players[id] = "Mobile"
+        else
+            if players[id] ~= "Mobile" then
+                players[id] = "PC"
+            end
+        end
+    end
+end
+
+function se.onVehicleSync(id, vehid, data)
+    if data.leftRightKeys ~= 0 then
+        if data.leftRightKeys ~= 128 and data.leftRightKeys ~= 65408 then
+            players[id] = "Mobile"
+        end
+    end
+end -- FIM PLATAFORMA
+
 function EnviarSmS(text) -- TAG MESSAGEM
     tag = '{FF0000}[JhowModsOfc]: '
     sampAddChatMessage(tag .. text, -1)
@@ -1210,7 +1273,9 @@ function se.onPlayerJoin(playerId, color, isNpc, nick)
     end
 end
 
-function se.onPlayerQuit(playerId, LRas)
+function se.onPlayerQuit(playerId)
+    players[playerId] = nil -- PLATAFORMA
+
     local nick = sampGetPlayerNickname(playerId)
     local MessagesLogString = string.format("{FFFFFF}%s[%d]{FF0004} SAIU DO SERVER{FFFFFF}", nick, playerId)
     table.insert(MessagesLog, 1, MessagesLogString)
