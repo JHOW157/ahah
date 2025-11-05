@@ -336,7 +336,7 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 end
                 imgui.Dummy(imgui.ImVec2(0, 20 * DPI))
             end
-            if Toggle(" ATIVAR CLIMA/TEMPO (BETA)", GUI.AtivarDiaClima) then
+            if Toggle(" ATIVAR CLIMA/TEMPO", GUI.AtivarDiaClima) then
                 Som1()
                 MostrarNotificacao("CLIMA/TEMPO", GUI.AtivarDiaClima[0])
             end
