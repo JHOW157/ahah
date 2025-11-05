@@ -321,11 +321,6 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 restoreCameraJumpcut()
                 clearCharTasksImmediately(PLAYER_PED)
             end
-            if imgui.Button(" LIMPAR CHAT", BotaoMob) then
-                for i = 1, 15 do
-					sampAddChatMessage("", -1)
-				end
-            end
             imgui.PopStyleColor(3)
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if Toggle(" ATIVAR FOV TELA", GUI.AtivarTelaEsticada) then
