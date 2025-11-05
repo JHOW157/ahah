@@ -321,6 +321,11 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 restoreCameraJumpcut()
                 clearCharTasksImmediately(PLAYER_PED)
             end
+            if imgui.Button(" LIMPAR CHAT", BotaoMob) then
+                for i = 1, 15 do
+					sampAddChatMessage("", -1)
+				end
+            end
             imgui.PopStyleColor(3)
             imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
             if Toggle(" ATIVAR FOV TELA", GUI.AtivarTelaEsticada) then
@@ -526,6 +531,16 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 MostrarNotificacao("ANT CRASH MOBILE", GUI.AntCrash[0])
                 SalvarConfig()
             end
+            imgui.Dummy(imgui.ImVec2(0, 25 * DPI))
+            imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.8, 0.0, 0.0, 1.0))
+            imgui.PushStyleColor(imgui.Col.ButtonHovered, imgui.ImVec4(1.0, 0.0, 0.0, 1.0))
+            imgui.PushStyleColor(imgui.Col.ButtonActive, imgui.ImVec4(0.6, 0.0, 0.0, 1.0))
+            if imgui.Button(" LIMPAR CHAT", BotaoMob) then
+                for i = 1, 15 do
+					sampAddChatMessage("", -1)
+				end
+            end
+            imgui.PopStyleColor(3)
         end
         if GUI.selected_category == "creditos" then
             if Imagem2 then
