@@ -20,7 +20,7 @@ imgui.OnInitialize(function()
 end)
 
 local GUI = {
-    AbrirMenu = imgui.new.bool(false),
+    AbrirMenu = imgui.new.bool(true),
 }
 
 imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
@@ -30,7 +30,6 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
     
     imgui.Begin("##menu_atualizacao", nil, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize + imgui.WindowFlags.NoTitleBar)
     
-    -- Fundo da janela
     local drawList = imgui.GetWindowDrawList()
     local windowPos = imgui.GetWindowPos()
     local windowSize = imgui.GetWindowSize()
@@ -69,6 +68,15 @@ function main()
             GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
         end
     end
+end
+
+function main()
+    while not isSampAvailable() do
+        wait(100)
+    end
+
+    GUI.AbrirMenu[0] = true
+
 end
 
 function openLink(link)
