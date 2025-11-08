@@ -1243,8 +1243,8 @@ end
 function DesenharNotificacoes()
     local alturaNotificacao = 70 * DPI
     local espacamento = 10 * DPI
-    local posX = LaguraX - 550 * DPI
-    local posYBase = AlturaY - 150 * DPI
+    local posX = largura - 550 * DPI
+    local posYBase = altura - 150 * DPI
     
     for i = #notificacoes, 1, -1 do
         local notif = notificacoes[i]
