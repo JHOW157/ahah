@@ -20,7 +20,7 @@ local FontPlataforma = renderCreateFont('Arial', 10, 12)
 local notificacoes = {}
 local camModes = {7, 8, 34, 45, 46, 51, 65}
 -- RESOLUCAO DA TELA
-local screenWidth, screenHeight = getScreenResolution()
+local largura, altura = getScreenResolution()
 -- FONTE
 local FontEspCar = renderCreateFont("Arial", 16, 12)
 local FontEspSkinId = renderCreateFont("Arial", 10, 5)
@@ -638,8 +638,8 @@ function main()
 		end
         
         if GUI.AtivarDraFov[0] and GUI.AtivarAimbot[0] and isPlayerArmed() and not IgnoreDrawFovArma() then -- DRAW FOV AIMBOT
-            local centerX = (screenWidth / 2) + 40 * DPI
-            local centerY = (screenHeight / 2) - 60 * DPI
+            local centerX = (largura / 2) + 40 * DPI
+            local centerY = (altura / 2) - 60 * DPI
             local radius = (GUI.FovAimbot[0] / 100) * 150
             
             local distanciaMaxima = math.floor((GUI.DistanciaAimbot[0] - 1) * (200 - 10) / (100 - 1)) + 10
@@ -816,8 +816,6 @@ function obterPosicaoDoOsso(id_char, id_osso)
     return posicao_osso[0].x, posicao_osso[0].y, posicao_osso[0].z
 end
 
-local larguraTela, alturaTela = getScreenResolution()
-
 function obterRotacaoDaCamera()
     local anguloHorizontal = camera_principal.aCams[0].fHorizontalAngle
     local anguloVertical = camera_principal.aCams[0].fVerticalAngle
@@ -846,7 +844,6 @@ function converterCoordenadasCartesianasParaEsfericas(posicao)
 end
 
 function obterPosicaoDoMiraNaTela()
-    local largura, altura = getScreenResolution()
     local posicaoX = largura * GUI.LaguraX[0]
     local posicaoY = altura * GUI.AlturaY[0]
     return posicaoX, posicaoY
@@ -875,7 +872,6 @@ end
 
 function obterCharProximoAoCentro(distanciaMaxima)
     local charsProximos = {}
-    local largura, altura = getScreenResolution()
     for _, char in ipairs(getAllChars()) do
         if isCharOnScreen(char) and char ~= PLAYER_PED and not isCharDead(char) then
             local coordX, coordY, coordZ = getCharCoordinates(char)
@@ -913,7 +909,6 @@ function Aimbot()
         
         local distanciaMaxima = math.floor((GUI.DistanciaAimbot[0] - 1) * (200 - 10) / (100 - 1)) + 10
         local suavidadeMaxia = math.floor(100 + (GUI.SuavidadeAimbot[0] - 1) * (250 - 100) / (100 - 1))
-        local largura, altura = getScreenResolution()
         local centroX, centroY = largura / 2, altura / 2
         local maxFovRadius = (GUI.FovAimbot[0] / 100) * 150
         local charProximo = nil
@@ -1073,8 +1068,7 @@ function EspLine() -- ESP LINE
                     local distance = getDistanceBetweenCoords3d(playerX, playerY, playerZ, targetX, targetY, targetZ)
                     if distance <= 300 then
                         local lineEndX, lineEndY = convert3DCoordsToScreen(targetX, targetY, targetZ)
-                        local screenWidth, screenHeight = getScreenResolution()
-                        local lineStartX = screenWidth / 2
+                        local lineStartX = largura / 2
                         local lineStartY = 0
                         renderDrawLine(lineStartX, lineStartY, lineEndX, lineEndY, 2 * DPI, 0xFFFF0000)
                     end
@@ -1247,7 +1241,6 @@ function MostrarNotificacao(tipo, estado) -- NOTIFICACAO
 end
     
 function DesenharNotificacoes()
-    local LaguraX, AlturaY = getScreenResolution()
     local alturaNotificacao = 70 * DPI
     local espacamento = 10 * DPI
     local posX = LaguraX - 550 * DPI
