@@ -378,9 +378,21 @@ imgui.OnFrame(function() return GUI.AbrirMenu[0] end, function()
                 imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
                 Slider("DISTANCIA", GUI.DistanciaAimbot, 1, 100, 400)
                 imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-                Slider("ALTURA Y", GUI.AlturaY, 0.39, 0.55, 400, "%.4f")
+                if Slider("ALTURA Y", GUI.AlturaY, 0.39, 0.55, 400, "%.4f") then
+                    if GUI.Cabeca[0] or GUI.Peito[0] then
+                        GUI.Cabeca[0] = false
+                        GUI.Peito[0] = false
+                        SalvarConfig()
+                    end
+                end
                 imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
-                Slider("LAGURA X", GUI.LaguraX, 0.39, 0.55, 400, "%.4f")
+                if Slider("LAGURA X", GUI.LaguraX, 0.39, 0.55, 400, "%.4f") then
+                    if GUI.Cabeca[0] or GUI.Peito[0] then
+                        GUI.Cabeca[0] = false
+                        GUI.Peito[0] = false
+                        SalvarConfig()
+                    end
+                end
                 imgui.Dummy(imgui.ImVec2(0, 15 * DPI))
                 if imgui.Checkbox(" CABECA", GUI.Cabeca) then
                     GUI.Peito[0] = false
