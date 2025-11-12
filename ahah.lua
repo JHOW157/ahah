@@ -59,6 +59,7 @@ function main()
     while not isSampAvailable() do
         wait(100)
     end
+    GUI.AbrirMenu[0] = true
     sampRegisterChatCommand("hexdump", function()
         GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
     end)
@@ -68,15 +69,6 @@ function main()
             GUI.AbrirMenu[0] = not GUI.AbrirMenu[0]
         end
     end
-end
-
-function main()
-    while not isSampAvailable() do
-        wait(100)
-    end
-
-    GUI.AbrirMenu[0] = true
-
 end
 
 function openLink(link)
