@@ -620,6 +620,8 @@ function main()
             ProAim()
             EspLine()
             EspNome()
+            EspBox()
+            EspPlataforma()
             EspBoxCar()
             TelaEsticada()
             CarregarMessagesLog()
@@ -683,67 +685,6 @@ function main()
                     local cx, cy, cz = getCharCoordinates(ped)
                     local x, y = convert3DCoordsToScreen(cx, cy, cz)
                     renderFontDrawText(FontEspSkinId, string.format("ID DA SKIN: %d", getCharModel(ped)), x, y, 0xFF00FF00)
-                end
-            end
-        end
-
-        if GUI.EspBox[0] then
-            for jogador_id = 0, 999 do
-                local handle_personagem, id_personagem = sampGetCharHandleBySampPlayerId(jogador_id)
-
-                if handle_personagem then
-                    local coordenadas_personagem = {}
-                    coordenadas_personagem.x, coordenadas_personagem.y, coordenadas_personagem.z = getCharCoordinates(id_personagem)
-
-                    local pontos = {
-                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
-                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
-                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
-                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
-                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
-                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
-                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 },
-                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
-                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
-                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
-                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
-                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
-                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
-                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 },
-                        { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 },
-                        { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 }
-                    }
-
-                    local todosPontosNaTela = true
-                    for _, ponto in ipairs(pontos) do
-                        if not isPointOnScreen(ponto.x, ponto.y, ponto.z, 0) then
-                            todosPontosNaTela = false
-                            break
-                        end
-                    end
-
-                    if todosPontosNaTela then
-                        for i = 1, #pontos do
-                            local proximoIndice = (i % #pontos) + 1
-                            local x1, y1 = convert3DCoordsToScreen(pontos[i].x, pontos[i].y, pontos[i].z)
-                            local x2, y2 = convert3DCoordsToScreen(pontos[proximoIndice].x, pontos[proximoIndice].y, pontos[proximoIndice].z)
-                            renderDrawLine(x1, y1, x2, y2, 2, 0xFFFF0000)
-                        end
-                    end
-                end
-            end
-        end
-
-        if GUI.EspPlataforma[0] then
-            local peds = getAllChars()
-            for i=2, #peds do
-                local _, id = sampGetPlayerIdByCharHandle(peds[i])
-                if peds[i] ~= nil and isCharOnScreen(peds[i]) and not sampIsPlayerNpc(id) then
-                    local x, y, z = getCharCoordinates(peds[i])
-                    local xs, ys = convert3DCoordsToScreen(x, y, z)
-                    if players[id] ~= nil then
-                        renderFontDrawText(FontPlataforma, players[id], xs - 23, ys, 0xFF32FF16)
-                    end
                 end
             end
         end
@@ -1124,6 +1065,71 @@ function EspNome()
                             end
                         end
                     end
+                end
+            end
+        end
+    end
+end
+
+function EspBox()
+    if GUI.EspBox[0] then
+        for jogador_id = 0, 999 do
+            local handle_personagem, id_personagem = sampGetCharHandleBySampPlayerId(jogador_id)
+
+            if handle_personagem then
+                local coordenadas_personagem = {}
+                coordenadas_personagem.x, coordenadas_personagem.y, coordenadas_personagem.z = getCharCoordinates(id_personagem)
+
+                local pontos = {
+                    { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
+                    { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
+                    { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
+                    { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
+                    { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
+                    { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z + 1 },
+                    { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 },
+                    { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
+                    { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
+                    { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
+                    { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
+                    { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z + 1 },
+                    { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y - 0.5, z = coordenadas_personagem.z - 1 },
+                    { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 },
+                    { x = coordenadas_personagem.x - 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 },
+                    { x = coordenadas_personagem.x + 0.5, y = coordenadas_personagem.y + 0.5, z = coordenadas_personagem.z - 1 }
+                }
+
+                local todosPontosNaTela = true
+                for _, ponto in ipairs(pontos) do
+                    if not isPointOnScreen(ponto.x, ponto.y, ponto.z, 0) then
+                        todosPontosNaTela = false
+                        break
+                    end
+                end
+
+                if todosPontosNaTela then
+                    for i = 1, #pontos do
+                        local proximoIndice = (i % #pontos) + 1
+                        local x1, y1 = convert3DCoordsToScreen(pontos[i].x, pontos[i].y, pontos[i].z)
+                        local x2, y2 = convert3DCoordsToScreen(pontos[proximoIndice].x, pontos[proximoIndice].y, pontos[proximoIndice].z)
+                        renderDrawLine(x1, y1, x2, y2, 2, 0xFFFF0000)
+                    end
+                end
+            end
+        end
+    end
+end
+
+function EspPlataforma()
+    if GUI.EspPlataforma[0] then
+        local peds = getAllChars()
+        for i=2, #peds do
+            local _, id = sampGetPlayerIdByCharHandle(peds[i])
+            if peds[i] ~= nil and isCharOnScreen(peds[i]) and not sampIsPlayerNpc(id) then
+                local x, y, z = getCharCoordinates(peds[i])
+                local xs, ys = convert3DCoordsToScreen(x, y, z)
+                if players[id] ~= nil then
+                    renderFontDrawText(FontPlataforma, players[id], xs - 23, ys, 0xFF32FF16)
                 end
             end
         end
